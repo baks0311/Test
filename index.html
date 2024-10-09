@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram QR Scanner</title>
+    <script>
+        // Вызов showScanQrPopup для сканирования QR-кода
+        function scanQRCode() {
+            Telegram.WebApp.showScanQrPopup({
+                text: 'Scan QR Code',
+                onSuccess: function(data) {
+                    // Отправка данных обратно в Telegram
+                    Telegram.WebApp.sendData(data);
+                },
+                onError: function() {
+                    alert('QR код не распознан.');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Нажмите кнопку для сканирования QR-кода</h1>
+    <button onclick="scanQRCode()">Сканировать QR-код</button>
+</body>
+</html>
