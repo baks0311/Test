@@ -5,44 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
     <script>
-        // Проверка готовности WebApp API
+        // Инициализация Telegram WebApp
         window.addEventListener('load', function() {
-            if (window.Telegram.WebApp) {
+            if (window.Telegram && window.Telegram.WebApp) {
                 console.log("Telegram WebApp API инициализировано.");
-                window.Telegram.WebApp.ready();  // Инициализируем WebApp
+                window.Telegram.WebApp.ready();  // Инициализируем WebApp API
 
-                // Меняем текст кнопки на активный, если WebApp API доступно
+                // Активация кнопки после инициализации
                 const scanButton = document.getElementById('scan-button');
-                scanButton.disabled = false;  // Активируем кнопку
+                scanButton.disabled = false;  // Делаем кнопку активной
             } else {
                 alert('Telegram WebApp API недоступно. Убедитесь, что WebApp запущен внутри Telegram.');
+                console.log('Ошибка: Telegram WebApp API не найдено');
             }
         });
 
         // Функция для сканирования QR-кода
         function scanQRCode() {
-            if (window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
-                // Открываем окно сканирования QR-кода
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
+                console.log('Открытие окна сканирования QR-кода...');
                 window.Telegram.WebApp.showScanQrPopup({
                     text: 'Сканировать QR-код',
                     onSuccess: function(data) {
-                        // Успешное сканирование, отправляем данные обратно в бота
-                        window.Telegram.WebApp.sendData(data);
+                        console.log('QR-код успешно отсканирован:', data);
+                        window.Telegram.WebApp.sendData(data);  // Отправляем данные обратно в бота
                     },
                     onError: function() {
-                        // Ошибка при сканировании
+                        console.log('Ошибка при сканировании QR-кода.');
                         alert('Не удалось распознать QR-код. Попробуйте еще раз.');
                     }
                 });
             } else {
-                alert('Сканирование QR-кода недоступно. Попробуйте на другом устройстве.');
+                alert('Сканирование QR-кодов недоступно. Убедитесь, что работаете на мобильном устройстве.');
+                console.log('Ошибка: Функция showScanQrPopup недоступна.');
             }
         }
     </script>
 </head>
 <body>
     <h1>Нажмите кнопку для сканирования QR-кода</h1>
-    <!-- Делаем кнопку неактивной по умолчанию, она станет активной при инициализации WebApp -->
+    <!-- Кнопка по умолчанию отключена, активируется после инициализации -->
     <button id="scan-button" onclick="scanQRCode()" disabled>Сканировать QR-код</button>
 </body>
 </html>
