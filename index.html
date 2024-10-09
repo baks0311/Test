@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
     <script>
-        // Вызов showScanQrPopup для сканирования QR-кода
         function scanQRCode() {
+            // Вызов встроенного окна для сканирования QR-кода через API Telegram
             Telegram.WebApp.showScanQrPopup({
                 text: 'Scan QR Code',
                 onSuccess: function(data) {
-                    // Отправка данных обратно в Telegram
+                    // Отправляем результат сканирования обратно в Telegram
                     Telegram.WebApp.sendData(data);
                 },
                 onError: function() {
