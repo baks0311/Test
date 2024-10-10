@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -49,51 +49,29 @@
             });
         }
 
-        // Функция для сжатия изображения
-        function resizeImage(image, maxWidth, maxHeight) {
-            const canvas = document.createElement('canvas');
-            let width = image.width;
-            let height = image.height;
+        // Обработка снимка
+        snapButton.addEventListener('click', function () {
+            const width = 640; // Ширина для сжатия
+            const height = 480; // Высота для сжатия
 
-            if (width > height) {
-                if (width > maxWidth) {
-                    height *= maxWidth / width;
-                    width = maxWidth;
-                }
-            } else {
-                if (height > maxHeight) {
-                    width *= maxHeight / height;
-                    height = maxHeight;
-                }
-            }
-
+            // Настройка canvas под новые размеры
             canvas.width = width;
             canvas.height = height;
 
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(image, 0, 0, width, height);
+            // Отрисовка изображения с видео с уменьшением размера
+            context.drawImage(video, 0, 0, width, height);
 
-            return canvas.toDataURL('image/jpeg', 0.7);  // Сжимаем в JPEG с качеством 0.7
-        }
+            // Получаем данные изображения в формате Base64
+            const imageData = canvas.toDataURL('image/jpeg', 0.8); // 0.8 — качество изображения
 
-        // Обработка снимка
-        snapButton.addEventListener('click', function () {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            // Проверка размера изображения
+            if (imageData.length > 4096) {
+                alert('Размер изображения слишком велик!');
+                return;
+            }
 
-            // Сжимаем изображение перед отправкой
-            const image = new Image();
-            image.src = canvas.toDataURL('image/png');
-            image.onload = function() {
-                const resizedImageData = resizeImage(image, 800, 600);  // Устанавливаем максимальные размеры 800x600
-                // Отправляем уменьшенное фото в Telegram бота
-                try {
-                    Telegram.WebApp.sendData(resizedImageData);  // Отправляем сжатое изображение
-                } catch (error) {
-                    console.error("Ошибка при отправке данных:", error);
-                }
-            };
+            // Отправка изображения в Telegram WebApp
+            Telegram.WebApp.sendData(imageData);  // Отправляем фото боту
         });
 
         // Уведомляем Telegram, что WebApp готов
