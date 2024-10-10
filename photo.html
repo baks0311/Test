@@ -51,10 +51,10 @@
 
         // Обработка снимка
         snapButton.addEventListener('click', function () {
-            const width = 640; // Ширина для сжатия
-            const height = 480; // Высота для сжатия
+            const width = 640; // Устанавливаем ширину для сжатия
+            const height = 480; // Устанавливаем высоту для сжатия
 
-            // Настройка canvas под новые размеры
+            // Настройка canvas под уменьшенные размеры
             canvas.width = width;
             canvas.height = height;
 
@@ -62,16 +62,13 @@
             context.drawImage(video, 0, 0, width, height);
 
             // Получаем данные изображения в формате Base64
-            const imageData = canvas.toDataURL('image/jpeg', 0.8); // 0.8 — качество изображения
+            const imageData = canvas.toDataURL('image/jpeg', 0.8); // 0.8 — качество сжатия
 
-            // Проверка размера изображения
-            if (imageData.length > 4096) {
-                alert('Размер изображения слишком велик!');
-                return;
-            }
-
-            // Отправка изображения в Telegram WebApp
-            Telegram.WebApp.sendData(imageData);  // Отправляем фото боту
+            // Отправляем изображение в Telegram WebApp
+            Telegram.WebApp.sendData(JSON.stringify({
+                imageData: imageData,
+                type: "photo"
+            }));
         });
 
         // Уведомляем Telegram, что WebApp готов
