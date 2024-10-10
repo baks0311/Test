@@ -30,6 +30,12 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
+        }
+        #photo-preview {
+            margin-top: 10px;
+            max-width: 600px;
+            border: 2px solid #ccc;
         }
     </style>
 </head>
@@ -38,11 +44,13 @@
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
     <button id="capture-btn">Сфотографировать</button>
+    <img id="photo-preview" src="" alt="Фото предварительного просмотра">
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const captureButton = document.getElementById('capture-btn');
+        const photoPreview = document.getElementById('photo-preview');
 
         // Запрашиваем доступ к камере
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -63,8 +71,14 @@
             // Получаем изображение в base64
             const imageData = canvas.toDataURL('image/png');
 
+            // Отображаем предварительный просмотр фото
+            photoPreview.src = imageData;
+
             // Отправляем фото в Telegram WebApp
             Telegram.WebApp.sendData(imageData);
+
+            // Для отладки
+            console.log("Изображение отправлено: ", imageData);
         });
 
         // Сообщаем Telegram, что WebApp готов
