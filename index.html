@@ -6,19 +6,21 @@
     <title>Telegram QR Scanner</title>
     <script>
         window.addEventListener('load', function() {
+            // Проверяем, доступен ли WebApp API Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 console.log("Telegram WebApp API инициализировано.");
                 window.Telegram.WebApp.ready();  // Инициализируем WebApp API
-
-                // Активация кнопки после инициализации
+                
+                // Активация кнопки после инициализации API
                 const scanButton = document.getElementById('scan-button');
-                scanButton.disabled = false;  // Делаем кнопку активной
+                scanButton.disabled = false;
             } else {
                 alert('Telegram WebApp API недоступно. Убедитесь, что WebApp запущен внутри Telegram.');
                 console.log('Ошибка: Telegram WebApp API не найдено');
             }
         });
 
+        // Функция для сканирования QR-кода
         function scanQRCode() {
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
                 console.log('Открытие окна сканирования QR-кода...');
