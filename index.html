@@ -4,50 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
+    
+    <!-- Подключаем telegram-web-app.js для работы с Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Нажмите кнопку для сканирования QR-кода</h1>
+        <button id="scan-button" disabled>Сканировать QR-код</button>
+    </div>
+
     <script>
         window.addEventListener('load', function() {
-            // Проверяем, запущен ли WebApp внутри Telegram
+            // Проверяем инициализацию Telegram WebApp API
             if (window.Telegram && window.Telegram.WebApp) {
                 console.log("Telegram WebApp API инициализировано.");
-                window.Telegram.WebApp.ready();  // Инициализируем WebApp API
+                window.Telegram.WebApp.ready();  // Готовим WebApp
 
-                // Активируем кнопку после инициализации
+                // Устанавливаем основной цвет темы
+                window.Telegram.WebApp.setHeaderColor("#ffffff");
+
+                // Активируем кнопку сканирования
                 const scanButton = document.getElementById('scan-button');
-                scanButton.disabled = false;  // Делаем кнопку активной
+                scanButton.disabled = false;
+
+                // Добавляем событие на кнопку для сканирования QR-кодов
+                scanButton.addEventListener('click', function() {
+                    scanQRCode();
+                });
             } else {
-                // Сообщаем об ошибке, если API не найден
                 alert('Telegram WebApp API недоступен. Убедитесь, что WebApp запущен внутри Telegram.');
-                console.log('Ошибка: Telegram WebApp API не найдено');
+                console.log('Ошибка: Telegram WebApp API не найдено.');
             }
         });
 
-        // Функция для сканирования QR-кода
         function scanQRCode() {
-            // Проверяем, поддерживается ли функция сканирования
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
                 console.log('Открытие окна сканирования QR-кода...');
+                
                 window.Telegram.WebApp.showScanQrPopup({
                     text: 'Сканировать QR-код',
                     onSuccess: function(data) {
                         console.log('QR-код успешно отсканирован:', data);
-                        // Отправляем данные обратно в бота
-                        window.Telegram.WebApp.sendData(data);  // Отправляем данные обратно в Telegram бот
+                        window.Telegram.WebApp.sendData(data);  // Отправляем данные в бот
                     },
                     onError: function() {
                         console.log('Ошибка при сканировании QR-кода.');
                         alert('Ошибка при сканировании QR-кода. Попробуйте снова.');
                     }
                 });
+
+                window.Telegram.WebApp.onEvent('scanQrPopupClosed', function() {
+                    console.log('Сканирование QR-кода завершено или отменено.');
+                });
             } else {
-                // Сообщаем об отсутствии поддержки сканирования
                 alert('Сканирование QR-кодов недоступно. Проверьте, что WebApp запущен внутри Telegram.');
                 console.log('Ошибка: Функция showScanQrPopup недоступна.');
             }
         }
     </script>
-</head>
-<body>
-    <h1>Сканирование QR-кода</h1>
-    <button id="scan-button" onclick="scanQRCode()" disabled>Сканировать QR-код</button>
 </body>
 </html>
