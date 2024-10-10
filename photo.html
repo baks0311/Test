@@ -33,7 +33,7 @@
 </head>
 <body>
     <h1>Сделайте фотографию</h1>
-    <video id="video" autoplay></video>
+    <video id="video" autoplay playsinline></video> <!-- "playsinline" for better mobile support -->
     <canvas id="canvas"></canvas>
     <button id="snap">Сфотографировать</button>
 
@@ -43,35 +43,46 @@
         const snapButton = document.getElementById('snap');
         const context = canvas.getContext('2d');
 
-        // Запрашиваем доступ к камере и отображаем поток видео
+        // Request access to the camera and display the video stream
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    video.srcObject = stream;
-                    video.play();
+                    video.srcObject = stream; // Assign video stream to the video element
+                    video.play();  // Start the video playback
                 })
                 .catch(err => {
                     console.error("Ошибка доступа к камере: ", err);
+                    alert("Ошибка доступа к камере. Пожалуйста, предоставьте доступ.");
                 });
+        } else {
+            alert("Ваш браузер не поддерживает доступ к камере.");
         }
 
-        // Снимок с видео и отправка данных
+        // Capture image when the snap button is clicked
         snapButton.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            // Make sure the video is loaded before capturing the image
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                // Set canvas dimensions to match the video size
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
 
-            // Получаем фото в формате base64
-            const imageData = canvas.toDataURL('image/png');
+                // Draw the current video frame on the canvas
+                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-            // Отправляем фото через Telegram WebApp API
-            Telegram.WebApp.sendData(imageData);
+                // Get the image data as base64 from the canvas
+                const imageData = canvas.toDataURL('image/png');
 
-            // Отладка: выводим фото в консоль
-            console.log("Изображение отправлено: ", imageData);
+                // Send the image data to Telegram WebApp
+                Telegram.WebApp.sendData(imageData);
+
+                // For debugging: Output the image data to the console
+                console.log("Изображение отправлено: ", imageData);
+            } else {
+                alert("Видео не загружено. Пожалуйста, подождите.");
+            }
         });
 
-        // Уведомляем Telegram, что WebApp готов
+        // Notify Telegram that the WebApp is ready
         Telegram.WebApp.ready();
     </script>
 </body>
