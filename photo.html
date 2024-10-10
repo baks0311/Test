@@ -18,7 +18,6 @@
         video {
             max-width: 100%;
             height: auto;
-            border: 2px solid #ccc;
         }
         canvas {
             display: none;
@@ -27,13 +26,12 @@
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Сделайте фотографию</h1>
-    <video id="video" autoplay playsinline></video> <!-- "playsinline" for better mobile support -->
+    <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
     <button id="snap">Сфотографировать</button>
 
@@ -43,46 +41,38 @@
         const snapButton = document.getElementById('snap');
         const context = canvas.getContext('2d');
 
-        // Request access to the camera and display the video stream
+        // Запуск камеры
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream; // Assign video stream to the video element
-                    video.play();  // Start the video playback
-                })
-                .catch(err => {
-                    console.error("Ошибка доступа к камере: ", err);
-                    alert("Ошибка доступа к камере. Пожалуйста, предоставьте доступ.");
-                });
-        } else {
-            alert("Ваш браузер не поддерживает доступ к камере.");
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                video.srcObject = stream;
+                video.play();
+            });
         }
 
-        // Capture image when the snap button is clicked
-        snapButton.addEventListener('click', () => {
-            // Make sure the video is loaded before capturing the image
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                // Set canvas dimensions to match the video size
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+        // Обработка снимка
+        snapButton.addEventListener('click', function () {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-                // Draw the current video frame on the canvas
-                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            // Преобразуем изображение в Blob для уменьшения размера
+            canvas.toBlob(function(blob) {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function() {
+                    const imageData = reader.result;
 
-                // Get the image data as base64 from the canvas
-                const imageData = canvas.toDataURL('image/png');
-
-                // Send the image data to Telegram WebApp
-                Telegram.WebApp.sendData(imageData);
-
-                // For debugging: Output the image data to the console
-                console.log("Изображение отправлено: ", imageData);
-            } else {
-                alert("Видео не загружено. Пожалуйста, подождите.");
-            }
+                    // Проверяем размер данных и отправляем через WebApp.sendData
+                    if (imageData.length <= 4096) {
+                        Telegram.WebApp.sendData(imageData);  // Отправляем фото боту
+                    } else {
+                        alert("Размер изображения слишком велик для отправки через WebApp. Попробуйте уменьшить его.");
+                    }
+                };
+            }, 'image/jpeg', 0.7);  // Уменьшаем качество до 70%
         });
 
-        // Notify Telegram that the WebApp is ready
+        // Уведомляем Telegram, что WebApp готов
         Telegram.WebApp.ready();
     </script>
 </body>
