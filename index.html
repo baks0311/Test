@@ -3,106 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram QR Scanner</title>
-    
-    <!-- Подключаем telegram-web-app.js для работы с Telegram WebApp API -->
+    <title>QR Code Scanner and Multimedia Capture</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            text-align: center;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-
-        .container {
-            max-width: 400px;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        video {
+            max-width: 100%;
+            height: auto;
         }
-
+        canvas {
+            display: none;
+        }
         button {
+            margin-top: 10px;
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
-
-        button:disabled {
-            background-color: #cccccc;
+        #qr-scan, #photo-capture {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Нажмите кнопку для сканирования QR-кода</h1>
-        <button id="scan-button" disabled>Сканировать QR-код</button>
+    <h1>Выберите действие</h1>
+    <button id="start-scan">Сканировать QR-код</button>
+    <button id="start-photo">Сделать фотографию</button>
+
+    <!-- QR код сканирование -->
+    <div id="qr-scan">
+        <h2>Сканирование QR-кода</h2>
+        <video id="qr-video" autoplay></video>
+        <button id="stop-scan">Остановить сканирование</button>
+    </div>
+
+    <!-- Фото съемка -->
+    <div id="photo-capture">
+        <h2>Сделайте фотографию</h2>
+        <video id="photo-video" autoplay></video>
+        <canvas id="photo-canvas"></canvas>
+        <button id="snap">Сфотографировать</button>
+        <button id="stop-photo">Остановить камеру</button>
     </div>
 
     <script>
-        window.addEventListener('load', function() {
-            // Проверяем инициализацию Telegram WebApp API
-            if (window.Telegram && window.Telegram.WebApp) {
-                console.log("Telegram WebApp API инициализировано.");
-                window.Telegram.WebApp.ready();  // Готовим WebApp
+        const qrScanDiv = document.getElementById('qr-scan');
+        const photoCaptureDiv = document.getElementById('photo-capture');
+        const qrVideo = document.getElementById('qr-video');
+        const photoVideo = document.getElementById('photo-video');
+        const photoCanvas = document.getElementById('photo-canvas');
+        const snapButton = document.getElementById('snap');
+        const photoContext = photoCanvas.getContext('2d');
 
-                // Устанавливаем основной цвет темы
-                window.Telegram.WebApp.setHeaderColor("#ffffff");
-
-                // Активируем кнопку сканирования
-                const scanButton = document.getElementById('scan-button');
-                scanButton.disabled = false;
-
-                // Добавляем событие на кнопку для сканирования QR-кодов
-                scanButton.addEventListener('click', function() {
-                    scanQRCode();
-                });
-            } else {
-                alert('Telegram WebApp API недоступен. Убедитесь, что WebApp запущен внутри Telegram.');
-                console.log('Ошибка: Telegram WebApp API не найдено.');
-            }
+        // Показать режим сканирования QR-кода
+        document.getElementById('start-scan').addEventListener('click', () => {
+            qrScanDiv.style.display = 'block';
+            photoCaptureDiv.style.display = 'none';
+            startQRScan();
         });
 
-        function scanQRCode() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
-                console.log('Открытие окна сканирования QR-кода...');
-                
-                // Вызов функции для показа popup для сканирования QR
-                window.Telegram.WebApp.showScanQrPopup({
-                    text: 'Сканировать QR-код'
-                });
+        // Показать режим съемки фото
+        document.getElementById('start-photo').addEventListener('click', () => {
+            photoCaptureDiv.style.display = 'block';
+            qrScanDiv.style.display = 'none';
+            startPhotoCapture();
+        });
 
-                // Обработка события успешного сканирования QR-кода
-                window.Telegram.WebApp.onEvent('qrTextReceived', function(event) {
-                    const qrText = event.data;
-                    console.log('QR-код успешно отсканирован:', qrText);
+        // Остановка сканирования QR-кода
+        document.getElementById('stop-scan').addEventListener('click', () => {
+            stopQRScan();
+        });
 
-                    // Отправляем отсканированные данные в бот
-                    window.Telegram.WebApp.sendData(qrText);
+        // Остановка камеры для фотосъемки
+        document.getElementById('stop-photo').addEventListener('click', () => {
+            stopPhotoCapture();
+        });
 
-                    // Закрываем popup сканирования
-                    window.Telegram.WebApp.closeScanQrPopup();
-                });
+        // Запуск камеры для сканирования QR-кода
+        function startQRScan() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                    .then(function (stream) {
+                        qrVideo.srcObject = stream;
+                        qrVideo.play();
+                    });
 
-                // Обработка закрытия окна сканирования
-                window.Telegram.WebApp.onEvent('scanQrPopupClosed', function() {
-                    console.log('Сканирование QR-кода завершено или отменено.');
-                });
-            } else {
-                alert('Сканирование QR-кодов недоступно. Проверьте, что WebApp запущен внутри Telegram.');
-                console.log('Ошибка: Функция showScanQrPopup недоступна.');
+                // Эмуляция сканирования QR-кода
+                setTimeout(() => {
+                    const qrData = "Симулированный QR-код";  // Замени это на реальное распознавание QR-кода
+                    Telegram.WebApp.sendData(qrData);  // Отправка QR-кода в бота
+                }, 5000); // Сканирование через 5 секунд
             }
         }
+
+        // Остановка сканирования QR-кода
+        function stopQRScan() {
+            const stream = qrVideo.srcObject;
+            const tracks = stream.getTracks();
+
+            tracks.forEach(track => track.stop());
+            qrVideo.srcObject = null;
+        }
+
+        // Запуск камеры для фотосъемки
+        function startPhotoCapture() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                    photoVideo.srcObject = stream;
+                    photoVideo.play();
+                });
+            }
+        }
+
+        // Остановка камеры для фотосъемки
+        function stopPhotoCapture() {
+            const stream = photoVideo.srcObject;
+            const tracks = stream.getTracks();
+
+            tracks.forEach(track => track.stop());
+            photoVideo.srcObject = null;
+        }
+
+        // Обработка снимка
+        snapButton.addEventListener('click', function () {
+            photoCanvas.width = photoVideo.videoWidth;
+            photoCanvas.height = photoVideo.videoHeight;
+            photoContext.drawImage(photoVideo, 0, 0, photoVideo.videoWidth, photoVideo.videoHeight);
+
+            // Отправка фото в Telegram бота
+            const imageData = photoCanvas.toDataURL('image/png');
+            Telegram.WebApp.sendData(imageData);  // Отправляем фото боту
+        });
+
+        // Уведомляем Telegram, что WebApp готов
+        Telegram.WebApp.ready();
     </script>
 </body>
 </html>
