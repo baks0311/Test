@@ -3,33 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Capture</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Take a Photo</title>
     <style>
-        #camera {
-            width: 100%;
-            max-height: 400px;
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
         }
-        #capture-btn {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #0088cc;
-            color: white;
-            border: none;
+        #video {
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+            border: 2px solid #ccc;
+            margin-bottom: 10px;
+        }
+        #canvas {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h2>Сфотографируйте объект</h2>
-    <video id="camera" autoplay></video>
+
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
     <button id="capture-btn">Сфотографировать</button>
-    <canvas id="canvas" style="display: none;"></canvas>
 
     <script>
-        const video = document.getElementById('camera');
+        const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const captureBtn = document.getElementById('capture-btn');
+        const captureButton = document.getElementById('capture-btn');
 
         // Запрашиваем доступ к камере
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -40,8 +53,8 @@
                 console.error("Ошибка доступа к камере: ", err);
             });
 
-        // Обрабатываем кнопку захвата фото
-        captureBtn.addEventListener('click', () => {
+        // Обработчик для кнопки "Сфотографировать"
+        captureButton.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
