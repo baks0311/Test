@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -49,27 +49,51 @@
             });
         }
 
+        // Функция для сжатия изображения
+        function resizeImage(image, maxWidth, maxHeight) {
+            const canvas = document.createElement('canvas');
+            let width = image.width;
+            let height = image.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(image, 0, 0, width, height);
+
+            return canvas.toDataURL('image/jpeg', 0.7);  // Сжимаем в JPEG с качеством 0.7
+        }
+
         // Обработка снимка
         snapButton.addEventListener('click', function () {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-            // Преобразуем изображение в Blob для уменьшения размера
-            canvas.toBlob(function(blob) {
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function() {
-                    const imageData = reader.result;
-
-                    // Проверка длины данных и отправка через WebApp.sendData
-                    if (imageData.length <= 4096) {
-                        Telegram.WebApp.sendData(imageData);  // Отправляем фото боту
-                    } else {
-                        alert("Размер изображения слишком велик для отправки через WebApp. Попробуйте уменьшить его.");
-                    }
-                };
-            }, 'image/jpeg', 0.5);  // Сжимаем качество изображения до 50%
+            // Сжимаем изображение перед отправкой
+            const image = new Image();
+            image.src = canvas.toDataURL('image/png');
+            image.onload = function() {
+                const resizedImageData = resizeImage(image, 800, 600);  // Устанавливаем максимальные размеры 800x600
+                // Отправляем уменьшенное фото в Telegram бота
+                try {
+                    Telegram.WebApp.sendData(resizedImageData);  // Отправляем сжатое изображение
+                } catch (error) {
+                    console.error("Ошибка при отправке данных:", error);
+                }
+            };
         });
 
         // Уведомляем Telegram, что WebApp готов
