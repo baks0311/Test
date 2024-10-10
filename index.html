@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
     <script>
+        // Пытаемся инициализировать Telegram API
         window.addEventListener('load', function() {
-            // Проверяем, доступен ли WebApp API Telegram
             if (window.Telegram && window.Telegram.WebApp) {
+                // Telegram WebApp API доступен
                 console.log("Telegram WebApp API инициализировано.");
                 window.Telegram.WebApp.ready();  // Инициализируем WebApp API
-                
-                // Активация кнопки после инициализации API
+
+                // Активация кнопки после инициализации
                 const scanButton = document.getElementById('scan-button');
                 scanButton.disabled = false;
             } else {
+                // Telegram WebApp API не доступен
                 alert('Telegram WebApp API недоступно. Убедитесь, что WebApp запущен внутри Telegram.');
                 console.log('Ошибка: Telegram WebApp API не найдено');
             }
