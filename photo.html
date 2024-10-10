@@ -3,85 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Capture</title>
+    <title>Multimedia Capture</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #f0f0f0;
         }
-        #video {
-            width: 100%;
+        video {
+            max-width: 100%;
             height: auto;
-            max-width: 600px;
             border: 2px solid #ccc;
-            margin-bottom: 10px;
         }
-        #canvas {
+        canvas {
             display: none;
         }
         button {
+            margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
-        }
-        #photo-preview {
-            margin-top: 10px;
-            max-width: 600px;
-            border: 2px solid #ccc;
         }
     </style>
 </head>
 <body>
-
+    <h1>Сделайте фотографию</h1>
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
-    <button id="capture-btn">Сфотографировать</button>
-    <img id="photo-preview" src="" alt="Фото предварительного просмотра">
+    <button id="snap">Сфотографировать</button>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const captureButton = document.getElementById('capture-btn');
-        const photoPreview = document.getElementById('photo-preview');
+        const snapButton = document.getElementById('snap');
+        const context = canvas.getContext('2d');
 
-        // Запрашиваем доступ к камере
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Ошибка доступа к камере: ", err);
-            });
+        // Запрашиваем доступ к камере и отображаем поток видео
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => {
+                    console.error("Ошибка доступа к камере: ", err);
+                });
+        }
 
-        // Обработчик для кнопки "Сфотографировать"
-        captureButton.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
+        // Снимок с видео и отправка данных
+        snapButton.addEventListener('click', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-            // Получаем изображение в base64
+            // Получаем фото в формате base64
             const imageData = canvas.toDataURL('image/png');
 
-            // Отображаем предварительный просмотр фото
-            photoPreview.src = imageData;
-
-            // Отправляем фото в Telegram WebApp
+            // Отправляем фото через Telegram WebApp API
             Telegram.WebApp.sendData(imageData);
 
-            // Для отладки
+            // Отладка: выводим фото в консоль
             console.log("Изображение отправлено: ", imageData);
         });
 
-        // Сообщаем Telegram, что WebApp готов
+        // Уведомляем Telegram, что WebApp готов
         Telegram.WebApp.ready();
     </script>
 </body>
