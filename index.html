@@ -77,18 +77,24 @@
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
                 console.log('Открытие окна сканирования QR-кода...');
                 
+                // Вызов функции для показа popup для сканирования QR
                 window.Telegram.WebApp.showScanQrPopup({
-                    text: 'Сканировать QR-код',
-                    onSuccess: function(data) {
-                        console.log('QR-код успешно отсканирован:', data);
-                        window.Telegram.WebApp.sendData(data);  // Отправляем данные в бот
-                    },
-                    onError: function() {
-                        console.log('Ошибка при сканировании QR-кода.');
-                        alert('Ошибка при сканировании QR-кода. Попробуйте снова.');
-                    }
+                    text: 'Сканировать QR-код'
                 });
 
+                // Обработка события успешного сканирования QR-кода
+                window.Telegram.WebApp.onEvent('qrTextReceived', function(event) {
+                    const qrText = event.data;
+                    console.log('QR-код успешно отсканирован:', qrText);
+
+                    // Отправляем отсканированные данные в бот
+                    window.Telegram.WebApp.sendData(qrText);
+
+                    // Закрываем popup сканирования
+                    window.Telegram.WebApp.closeScanQrPopup();
+                });
+
+                // Обработка закрытия окна сканирования
                 window.Telegram.WebApp.onEvent('scanQrPopupClosed', function() {
                     console.log('Сканирование QR-кода завершено или отменено.');
                 });
