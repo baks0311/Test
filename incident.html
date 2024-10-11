@@ -1,4 +1,3 @@
-<!-- incident.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,17 +30,22 @@
 <body>
     <h1>Выберите тип инцидента</h1>
     <div class="incident" onclick="sendIncident('Пожар')">
-        <img src="https://yourgithubusername.github.io/icons/fire.png" alt="Пожар">
+        <img src="fire.png" alt="Пожар">
         <span>Пожар</span>
     </div>
     <div class="incident" onclick="sendIncident('Ограбление')">
-        <img src="https://yourgithubusername.github.io/icons/robbery.png" alt="Ограбление">
+        <img src="robbery.png" alt="Ограбление">
         <span>Ограбление</span>
     </div>
     <div class="incident" onclick="sendIncident('Проникновение')">
-        <img src="https://yourgithubusername.github.io/icons/intrusion.png" alt="Проникновение">
+        <img src="intrusion.png" alt="Проникновение">
         <span>Проникновение</span>
     </div>
+    <div class="incident" onclick="sendIncident('Ремонт')">
+        <img src="repair.png" alt="Ремонт">
+        <span>Ремонт</span>
+    </div>
+    
     <script>
         function sendIncident(incident) {
             // Отправляем данные инцидента обратно боту
