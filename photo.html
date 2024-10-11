@@ -6,33 +6,45 @@
     <title>Photo Capture</title>
 </head>
 <body>
-    <h2>Сделайте фото:</h2>
+    <h1>Take a Photo</h1>
+    <p id="photo-status">Your photo will appear here.</p>
     <button onclick="takePhoto()">Сфотографировать</button>
-    <br><br>
-    <img id="photo" alt="Your photo will appear here" style="display:none;">
-    <br><br>
-    <button onclick="sendPhoto()">Отправить фото</button>
 
     <script>
+        // Telegram WebApp API initialization
+        Telegram.WebApp.ready();
+
         function takePhoto() {
-            // Логика для получения фотографии, как пример:
-            let photoElement = document.getElementById('photo');
-            // Здесь будет ваша логика получения фото (например, через камеру)
-            photoElement.src = 'data:image/jpeg;base64,...';  // пример
-            photoElement.style.display = 'block';  // Показываем фото
+            const photo = "data:image/jpeg;base64,..."; // Симуляция полученного фото
+            document.getElementById("photo-status").textContent = "Photo taken!";
+
+            // Показать фото на странице
+            const img = document.createElement("img");
+            img.src = photo;
+            document.body.appendChild(img);
+
+            // Отправка фото через Telegram WebApp API
+            sendPhoto(photo);
         }
 
-        function sendPhoto() {
-            let imageData = document.getElementById('photo').src;
-            if (imageData) {
-                Telegram.WebApp.sendData(JSON.stringify({ imageData }));
-            } else {
-                alert("Фото не найдено!");
+        function sendPhoto(photoData) {
+            if (!photoData) {
+                alert('Ошибка: Не удалось сделать фото.');
+                return;
+            }
+
+            const data = JSON.stringify({
+                imageData: photoData  // base64 строка изображения
+            });
+
+            try {
+                Telegram.WebApp.sendData(data);  // Отправляем данные в бота
+                alert('Фото успешно отправлено!');
+            } catch (error) {
+                console.error('Ошибка при отправке данных: ', error);
+                alert('Ошибка при отправке фото.');
             }
         }
-
-        // Инициализация WebApp
-        Telegram.WebApp.ready();
     </script>
 </body>
 </html>
