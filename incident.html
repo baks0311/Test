@@ -1,0 +1,52 @@
+<!-- incident.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор инцидента</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .incident {
+            display: inline-block;
+            margin: 15px;
+            text-align: center;
+        }
+        .incident img {
+            width: 80px;
+            height: 80px;
+        }
+        .incident span {
+            display: block;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Выберите тип инцидента</h1>
+    <div class="incident" onclick="sendIncident('Пожар')">
+        <img src="https://yourgithubusername.github.io/icons/fire.png" alt="Пожар">
+        <span>Пожар</span>
+    </div>
+    <div class="incident" onclick="sendIncident('Ограбление')">
+        <img src="https://yourgithubusername.github.io/icons/robbery.png" alt="Ограбление">
+        <span>Ограбление</span>
+    </div>
+    <div class="incident" onclick="sendIncident('Проникновение')">
+        <img src="https://yourgithubusername.github.io/icons/intrusion.png" alt="Проникновение">
+        <span>Проникновение</span>
+    </div>
+    <script>
+        function sendIncident(incident) {
+            // Отправляем данные инцидента обратно боту
+            Telegram.WebApp.sendData(incident);
+        }
+    </script>
+</body>
+</html>
