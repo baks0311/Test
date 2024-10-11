@@ -3,55 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Capture</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Photo App</title>
 </head>
 <body>
-    <h1>Photo Capture</h1>
+    <h1>Take a Photo</h1>
     <video id="video" width="320" height="240" autoplay></video>
-    <button onclick="takePhoto()">Сфотографировать</button>
-    <canvas id="canvas" style="display:none;"></canvas>
+    <button id="take-photo" onclick="takePhoto()">Сфотографировать</button>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <p id="message">Your photo will appear here</p>
+
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
 
-        // Инициализация Telegram Web App
-        Telegram.WebApp.ready();
-
-        // Получаем видео с камеры
+        // Запрашиваем разрешение на доступ к камере
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
             })
             .catch(err => {
-                console.log("Ошибка доступа к камере: " + err);
+                console.error("Ошибка доступа к камере: " + err);
             });
 
         function takePhoto() {
-            // Устанавливаем размеры canvas для уменьшения изображения
-            canvas.width = 320;
-            canvas.height = 240;
-
-            // Рисуем видео на canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Получаем изображение в формате base64
-            const imageData = canvas.toDataURL("image/jpeg", 0.7); // Сжатие до 70% качества
+            // Уменьшаем размер изображения до 50% для оптимизации
+            const resizedCanvas = document.createElement('canvas');
+            resizedCanvas.width = canvas.width / 2;
+            resizedCanvas.height = canvas.height / 2;
+            const resizedContext = resizedCanvas.getContext('2d');
+            resizedContext.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
 
-            // Отправляем изображение в бот через Telegram WebApp API
-            sendPhoto(imageData);
+            // Конвертируем уменьшенное изображение в base64
+            const photoData = resizedCanvas.toDataURL('image/jpeg');
+
+            sendPhoto(photoData);
         }
 
-        function sendPhoto(imageData) {
+        function sendPhoto(photoData) {
             try {
-                if (Telegram.WebApp) {
-                    Telegram.WebApp.sendData(imageData); // Отправляем изображение в формате base64
-                } else {
-                    console.error("Ошибка: Telegram WebApp не определен.");
-                }
-            } catch (e) {
-                console.error("Ошибка при отправке данных: ", e);
+                Telegram.WebApp.sendData(photoData);  // Отправка фото в бот
+            } catch (error) {
+                console.error("Ошибка при отправке данных: ", error);
+                document.getElementById('message').innerText = 'Ошибка при отправке фото';
             }
         }
     </script>
