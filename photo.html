@@ -3,52 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Capture</title>
+    <title>Take a Photo</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Take a Photo</h1>
-    <p id="photo-status">Your photo will appear here.</p>
-    <button onclick="takePhoto()">Сфотографировать</button>
+    <p>Your photo will appear here.</p>
+    <img id="photo" alt="Your Photo">
+    <br>
+    <button onclick="takePhoto()">Take a Photo</button>
 
     <script>
-        // Telegram WebApp API initialization
-        Telegram.WebApp.ready();
+        let photo = document.getElementById('photo');
 
         function takePhoto() {
-            const photo = "data:image/jpeg;base64,..."; // Симуляция полученного фото
-            document.getElementById("photo-status").textContent = "Photo taken!";
-
-            // Показать фото на странице
-            const img = document.createElement("img");
-            img.src = photo;
-            document.body.appendChild(img);
-
-            // Отправка фото через Telegram WebApp API
-            sendPhoto(photo);
-        }
-
-        function sendPhoto(photoData) {
-            if (!photoData) {
-                alert('Ошибка: Не удалось сделать фото.');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Camera not supported on this device.');
                 return;
             }
 
-            const data = JSON.stringify({
-                imageData: photoData  // base64 строка изображения
-            });
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    let video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
 
-            try {
-                // Проверка, что API инициализировано
-                if (Telegram.WebApp) {
-                    // Вызов асинхронной функции с подтверждением через пользовательское действие
-                    Telegram.WebApp.sendData(data);  // Отправляем данные в бота
-                    alert('Фото успешно отправлено!');
-                } else {
-                    alert('Ошибка: Telegram WebApp API не инициализировано.');
-                }
-            } catch (error) {
-                console.error('Ошибка при отправке данных: ', error);
-                alert('Ошибка при отправке фото.');
+                    let canvas = document.createElement('canvas');
+                    let context = canvas.getContext('2d');
+                    video.addEventListener('loadeddata', function () {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        let imageData = canvas.toDataURL('image/jpeg');
+                        sendPhoto(imageData);
+                        stream.getTracks().forEach(track => track.stop());
+                    });
+                })
+                .catch(function (error) {
+                    console.log("Error accessing the camera: ", error);
+                });
+        }
+
+        function sendPhoto(imageData) {
+            if (typeof Telegram !== "undefined") {
+                Telegram.WebApp.sendData(JSON.stringify({ imageData: imageData }));
+            } else {
+                alert("Ошибка при отправке данных: Telegram API не доступен");
             }
         }
     </script>
