@@ -13,7 +13,11 @@
     <script>
         // Функция для отправки данных в бота
         function sendLocationToBot(latitude, longitude) {
-            const locationData = { latitude, longitude };
+            const locationData = { 
+                latitude: latitude, 
+                longitude: longitude,
+                app_type: 'gps' // Указываем тип приложения для уникальной идентификации
+            };
             Telegram.WebApp.sendData(JSON.stringify(locationData));
         }
 
@@ -32,6 +36,7 @@
                     },
                     function (error) {
                         console.error("Ошибка при получении геопозиции:", error);
+                        document.getElementById("status").innerText = "Ошибка при получении геопозиции.";
                     },
                     { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
