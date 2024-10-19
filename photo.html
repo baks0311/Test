@@ -42,12 +42,20 @@
             // Конвертируем уменьшенное изображение в base64
             const photoData = resizedCanvas.toDataURL('image/jpeg');
 
+            // Отправляем данные с полем app_type
             sendPhoto(photoData);
         }
 
         function sendPhoto(photoData) {
             try {
-                Telegram.WebApp.sendData(photoData);  // Отправка фото в бот
+                const data = {
+                    app_type: 'photo',  // Указываем тип данных
+                    image_data_base64: photoData // Отправляем base64 изображение
+                };
+
+                // Отправляем данные как JSON
+                Telegram.WebApp.sendData(JSON.stringify(data));
+                document.getElementById('message').innerText = 'Фото успешно отправлено';
             } catch (error) {
                 console.error("Ошибка при отправке данных: ", error);
                 document.getElementById('message').innerText = 'Ошибка при отправке фото';
