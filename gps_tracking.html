@@ -14,11 +14,14 @@
         // Функция для отправки данных в бота
         function sendLocationToBot(latitude, longitude) {
             const locationData = {
-                app_type: 'gps',
+                app_type: 'gps',    // Добавляем тип данных для идентификации на стороне бота
                 latitude: latitude,
                 longitude: longitude
             };
+
+            // Отправляем данные в формате JSON
             Telegram.WebApp.sendData(JSON.stringify(locationData));
+            console.log("Данные отправлены в бота:", locationData);
         }
 
         // Функция отслеживания координат
@@ -29,6 +32,7 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
 
+                        // Обновляем отображение статуса координат
                         document.getElementById("status").innerText = `Координаты: ${latitude}, ${longitude}`;
 
                         // Отправляем координаты в бот
@@ -36,17 +40,32 @@
                     },
                     function (error) {
                         console.error("Ошибка при получении геопозиции:", error);
+                        document.getElementById("status").innerText = "Ошибка при получении геопозиции";
                     },
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    {
+                        enableHighAccuracy: true, // Высокая точность
+                        maximumAge: 0,            // Не кешировать координаты
+                        timeout: 5000             // Таймаут ожидания координат
+                    }
                 );
             } else {
-                document.getElementById("status").innerText = "Геолокация не поддерживается";
+                document.getElementById("status").innerText = "Геолокация не поддерживается вашим устройством.";
             }
         }
 
-        // Старт отслеживания при загрузке
-        Telegram.WebApp.ready();
-        startTrackingLocation();
+        // Проверяем готовность WebApp и запускаем отслеживание при загрузке страницы
+        window.addEventListener('load', function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                console.log("Telegram WebApp API инициализировано.");
+                Telegram.WebApp.ready();  // Сообщаем, что WebApp готово
+
+                // Старт отслеживания
+                startTrackingLocation();
+            } else {
+                alert('Telegram WebApp API недоступен. Убедитесь, что приложение запущено внутри Telegram.');
+                console.log('Ошибка: Telegram WebApp API не найдено.');
+            }
+        });
     </script>
 </body>
 </html>
