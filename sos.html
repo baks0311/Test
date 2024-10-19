@@ -72,13 +72,14 @@
 
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
-                const sosMessage = "🚨 ВНИМАНИЕ! Тревога!";
+                const sosData = {
+                    app_type: "sos_alert",  // Указываем тип данных как "sos_alert"
+                    message: "🚨 ВНИМАНИЕ! Тревога!"
+                };
 
-                // Отправляем сообщение тревоги боту
-                window.Telegram.WebApp.sendData(sosMessage);
-                console.log("Сообщение отправлено боту:", sosMessage);
-
-                // Здесь вы можете отправить сообщение в группу через бота на сервере
+                // Отправляем данные с полем app_type
+                window.Telegram.WebApp.sendData(JSON.stringify(sosData));
+                console.log("Сообщение отправлено боту:", sosData);
 
                 // Включаем вибрацию устройства
                 if (navigator.vibrate) {
