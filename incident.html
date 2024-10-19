@@ -56,8 +56,13 @@
     
     <script>
         function sendIncident(incident) {
-            // Отправляем данные инцидента обратно боту
-            Telegram.WebApp.sendData(incident);
+            // Подготовка данных для отправки
+            const data = {
+                app_type: 'incident',  // Указываем тип данных
+                incident_type: incident // Указываем тип инцидента
+            };
+            // Отправляем данные обратно боту
+            Telegram.WebApp.sendData(JSON.stringify(data));
         }
     </script>
 </body>
