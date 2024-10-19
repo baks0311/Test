@@ -22,29 +22,33 @@
         let mediaRecorder;
         let recordedChunks = [];
 
-        // Запрашиваем разрешение на доступ к камере
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                video.srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream);
+        // Запрашиваем разрешение на доступ к задней камере
+        navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: { exact: 'environment' } }, // Задняя камера
+            audio: true 
+        })
+        .then(stream => {
+            video.srcObject = stream;
+            mediaRecorder = new MediaRecorder(stream);
 
-                // Когда видео записано, собираем данные
-                mediaRecorder.ondataavailable = function(event) {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
-                };
+            // Когда видео записано, собираем данные
+            mediaRecorder.ondataavailable = function(event) {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
 
-                // Когда запись закончена, отправляем видео
-                mediaRecorder.onstop = function() {
-                    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-                    sendVideo(blob);
-                    recordedChunks = [];  // Очищаем для новой записи
-                };
-            })
-            .catch(err => {
-                console.error("Ошибка доступа к камере: " + err);
-            });
+            // Когда запись закончена, отправляем видео
+            mediaRecorder.onstop = function() {
+                const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+                sendVideo(blob);
+                recordedChunks = [];  // Очищаем для новой записи
+            };
+        })
+        .catch(err => {
+            console.error("Ошибка доступа к камере: " + err);
+            document.getElementById('message').innerText = 'Ошибка доступа к камере.';
+        });
 
         function takePhoto() {
             // Снимаем фото с камеры
@@ -73,7 +77,7 @@
                     image_data_base64: photoData // Отправляем base64 изображение
                 };
 
-                // Отправляем данные как JSON
+                // Отправляем данные как JSON в бот
                 Telegram.WebApp.sendData(JSON.stringify(data));
                 document.getElementById('message').innerText = 'Фото успешно отправлено';
             } catch (error) {
@@ -107,7 +111,7 @@
                         video_data_base64: base64data // Отправляем base64 видео
                     };
 
-                    // Отправляем данные как JSON
+                    // Отправляем данные как JSON в бот
                     Telegram.WebApp.sendData(JSON.stringify(data));
                     document.getElementById('message').innerText = 'Видео успешно отправлено';
                 } catch (error) {
