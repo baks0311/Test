@@ -4,30 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Photo App</title>
+    <title>Photo and Video App</title>
 </head>
 <body>
-    <h1>Take a Photo</h1>
+    <h1>Take a Photo or Record a Video</h1>
     <video id="video" width="320" height="240" autoplay></video>
     <button id="take-photo" onclick="takePhoto()">Сфотографировать</button>
+    <button id="start-record" onclick="startRecording()">Записать видео</button>
+    <button id="stop-record" onclick="stopRecording()" disabled>Остановить запись</button>
     <canvas id="canvas" style="display: none;"></canvas>
-    <p id="message">Your photo will appear here</p>
+    <p id="message">Your photo or video will appear here</p>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
+        let mediaRecorder;
+        let recordedChunks = [];
 
         // Запрашиваем разрешение на доступ к камере
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then(stream => {
                 video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+
+                // Когда видео записано, собираем данные
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                // Когда запись закончена, отправляем видео
+                mediaRecorder.onstop = function() {
+                    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+                    sendVideo(blob);
+                    recordedChunks = [];  // Очищаем для новой записи
+                };
             })
             .catch(err => {
                 console.error("Ошибка доступа к камере: " + err);
             });
 
         function takePhoto() {
+            // Снимаем фото с камеры
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -49,7 +69,7 @@
         function sendPhoto(photoData) {
             try {
                 const data = {
-                    app_type: 'photo',  // Указываем тип данных
+                    app_type: 'photo',  // Указываем тип данных как фото
                     image_data_base64: photoData // Отправляем base64 изображение
                 };
 
@@ -60,6 +80,41 @@
                 console.error("Ошибка при отправке данных: ", error);
                 document.getElementById('message').innerText = 'Ошибка при отправке фото';
             }
+        }
+
+        function startRecording() {
+            mediaRecorder.start();
+            document.getElementById('start-record').disabled = true;
+            document.getElementById('stop-record').disabled = false;
+            document.getElementById('message').innerText = 'Запись видео началась...';
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('start-record').disabled = false;
+            document.getElementById('stop-record').disabled = true;
+            document.getElementById('message').innerText = 'Запись видео завершена';
+        }
+
+        function sendVideo(videoBlob) {
+            const reader = new FileReader();
+            reader.readAsDataURL(videoBlob);
+            reader.onloadend = function() {
+                const base64data = reader.result;
+                try {
+                    const data = {
+                        app_type: 'video',  // Указываем тип данных как видео
+                        video_data_base64: base64data // Отправляем base64 видео
+                    };
+
+                    // Отправляем данные как JSON
+                    Telegram.WebApp.sendData(JSON.stringify(data));
+                    document.getElementById('message').innerText = 'Видео успешно отправлено';
+                } catch (error) {
+                    console.error("Ошибка при отправке данных: ", error);
+                    document.getElementById('message').innerText = 'Ошибка при отправке видео';
+                }
+            };
         }
     </script>
 </body>
