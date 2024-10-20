@@ -80,30 +80,12 @@
                 // Отправляем сообщение тревоги боту
                 window.Telegram.WebApp.sendData(sosMessage);
                 console.log("Сообщение отправлено боту:", sosMessage);
-
-                // Включаем звук и вибрацию 3 раза по 10 секунд с паузой 2 секунды
-                let repeatCount = 3;
-                function playRepeatedAlarm() {
-                    if (repeatCount > 0) {
-                        playAlarmSound();
-                        navigator.vibrate([1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]); // 10 секунд вибрации
-                        console.log("Вибрация активирована.");
-                        setTimeout(() => {
-                            repeatCount--;
-                            if (repeatCount > 0) {
-                                setTimeout(playRepeatedAlarm, 2000); // пауза 2 сек
-                            }
-                        }, 10000); // продолжительность 10 сек
-                    }
-                }
-
-                playRepeatedAlarm();
             }
         }
 
-        function playAlarmSound() {
-            // Аудиофайл из вашего репозитория на GitHub
-            const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
+        // Функция воспроизведения тревожного звука
+        function playAlarmSound(soundUrl) {
+            const audio = new Audio(soundUrl);
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
             }).catch((error) => {
@@ -111,13 +93,25 @@
             });
         }
 
-        // Добавляем обработчик для сообщений от Telegram WebApp
+        // Функция вибрации с указанным паттерном
+        function triggerVibration(vibrationPattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(vibrationPattern);
+                console.log("Вибрация активирована:", vibrationPattern);
+            } else {
+                console.log("Вибрация недоступна на данном устройстве.");
+            }
+        }
+
+        // Обрабатываем сообщение от бота
         window.addEventListener('message', (event) => {
             const data = event.data;
+            console.log("Получено сообщение от бота:", data);
+
             if (data.message === 'play_alarm') {
-                playAlarmSound();
-                navigator.vibrate(data.vibration_pattern);  // Активируем вибрацию по полученному паттерну
-                console.log("Сообщение с тревогой обработано.");
+                // Воспроизводим звук и вибрацию
+                playAlarmSound('https://baks0311.github.io/Test/' + data.sound);
+                triggerVibration(data.vibration_pattern);
             }
         });
     </script>
