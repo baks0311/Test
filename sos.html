@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram SOS Alarm</title>
-    
+
     <!-- Подключаем telegram-web-app.js для работы с Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -73,9 +73,8 @@
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
                 const sosMessage = JSON.stringify({
-                    message: 'play_alarm',
-                    sound: 'beep-11.mp3',
-                    vibration_pattern: [1000, 500, 1000] // вибрация
+                    message: "🚨 ВНИМАНИЕ! Тревога!",
+                    app_type: "sos_alert"
                 });
 
                 // Отправляем сообщение тревоги боту
@@ -98,13 +97,12 @@
                     }
                 }
 
-                // Запуск сигнала тревоги
                 playRepeatedAlarm();
             }
         }
 
         function playAlarmSound() {
-            // Замените ссылку на аудиофайл с новой ссылкой из вашего репозитория GitHub
+            // Аудиофайл из вашего репозитория на GitHub
             const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
