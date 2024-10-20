@@ -72,10 +72,13 @@
 
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
-                const sosMessage = "🚨 ВНИМАНИЕ! Тревога!";
+                const sosMessage = {
+                    'app_type': 'sos_alert',
+                    'message': '🚨 ВНИМАНИЕ! Тревога!'
+                };
 
                 // Отправляем сообщение тревоги боту
-                window.Telegram.WebApp.sendData(sosMessage);
+                window.Telegram.WebApp.sendData(JSON.stringify(sosMessage));
                 console.log("Сообщение отправлено боту:", sosMessage);
 
                 // Включаем вибрацию устройства
@@ -92,7 +95,7 @@
         }
 
         function playAlarmSound() {
-            // Замените ссылку на аудиофайл с новой ссылкой из вашего репозитория GitHub
+            // Используем аудиофайл с GitHub
             const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
@@ -100,6 +103,25 @@
                 console.error("Ошибка воспроизведения звука:", error);
             });
         }
+
+        // Функция для обработки команды на воспроизведение тревоги от бота
+        function handleAlarm(data) {
+            if (data.message === 'play_alarm') {
+                const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
+                audio.play();
+
+                // Включаем вибрацию
+                if (navigator.vibrate) {
+                    navigator.vibrate([1000, 500, 1000]);
+                }
+            }
+        }
+
+        // Слушаем событие от бота для воспроизведения сигнала тревоги и вибрации
+        window.Telegram.WebApp.onEvent('message', function(event) {
+            const data = JSON.parse(event.data);
+            handleAlarm(data);
+        });
     </script>
 </body>
 </html>
