@@ -80,23 +80,13 @@
                 // Отправляем сообщение тревоги боту
                 window.Telegram.WebApp.sendData(JSON.stringify(sosMessage));
                 console.log("Сообщение отправлено боту:", sosMessage);
-
-                // Включаем вибрацию устройства
-                if (navigator.vibrate) {
-                    navigator.vibrate([1000, 500, 1000]);  // Вибрация с паузой
-                    console.log("Вибрация активирована.");
-                } else {
-                    console.log("Вибрация недоступна на данном устройстве.");
-                }
-
-                // Звонок (играем аудио сигнал тревоги)
-                playAlarmSound();
             }
         }
 
         function playAlarmSound() {
             // Используем аудиофайл с GitHub
             const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
+            audio.loop = true;  // Звук будет повторяться
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
             }).catch((error) => {
@@ -104,16 +94,23 @@
             });
         }
 
+        // Обработчик для включения вибрации
+        function activateVibration(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+                console.log("Вибрация активирована:", pattern);
+            } else {
+                console.log("Вибрация недоступна на данном устройстве.");
+            }
+        }
+
         // Функция для обработки команды на воспроизведение тревоги от бота
         function handleAlarm(data) {
             if (data.message === 'play_alarm') {
-                const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
-                audio.play();
-
-                // Включаем вибрацию
-                if (navigator.vibrate) {
-                    navigator.vibrate([1000, 500, 1000]);
-                }
+                playAlarmSound();
+                activateVibration(data.vibration_pattern);
+            } else if (data.message === 'stop_alarm') {
+                stopAlarm();  // Функция для остановки звука и вибрации
             }
         }
 
@@ -122,6 +119,13 @@
             const data = JSON.parse(event.data);
             handleAlarm(data);
         });
+
+        function stopAlarm() {
+            const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
+            audio.pause();  // Остановить звук
+            navigator.vibrate(0);  // Остановить вибрацию
+            console.log("Звук и вибрация остановлены.");
+        }
     </script>
 </body>
 </html>
