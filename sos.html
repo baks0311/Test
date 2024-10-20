@@ -104,7 +104,7 @@
         }
 
         // Обрабатываем сообщение от бота
-        window.addEventListener('message', (event) => {
+        window.Telegram.WebApp.onEvent('message', (event) => {
             const data = event.data;
             console.log("Получено сообщение от бота:", data);
 
