@@ -80,40 +80,34 @@
                 // Отправляем сообщение тревоги боту
                 window.Telegram.WebApp.sendData(sosMessage);
                 console.log("Сообщение отправлено боту:", sosMessage);
+
+                // Включаем звук и вибрацию
+                playRepeatedAlarm();
             }
         }
 
-        // Функция воспроизведения тревожного звука
-        function playAlarmSound(soundUrl) {
-            const audio = new Audio(soundUrl);
+        function playRepeatedAlarm() {
+            let repeatCount = 3;
+            function playAlarm() {
+                if (repeatCount > 0) {
+                    playAlarmSound();
+                    navigator.vibrate([1000, 500, 1000]); // Вибрация
+                    console.log("Вибрация активирована.");
+                    repeatCount--;
+                    setTimeout(playAlarm, 2000);  // Пауза между сигналами
+                }
+            }
+            playAlarm();
+        }
+
+        function playAlarmSound() {
+            const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
             }).catch((error) => {
                 console.error("Ошибка воспроизведения звука:", error);
             });
         }
-
-        // Функция вибрации с указанным паттерном
-        function triggerVibration(vibrationPattern) {
-            if (navigator.vibrate) {
-                navigator.vibrate(vibrationPattern);
-                console.log("Вибрация активирована:", vibrationPattern);
-            } else {
-                console.log("Вибрация недоступна на данном устройстве.");
-            }
-        }
-
-        // Обрабатываем сообщение от бота
-        window.Telegram.WebApp.onEvent('message', (event) => {
-            const data = event.data;
-            console.log("Получено сообщение от бота:", data);
-
-            if (data.message === 'play_alarm') {
-                // Воспроизводим звук и вибрацию
-                playAlarmSound('https://baks0311.github.io/Test/' + data.sound);
-                triggerVibration(data.vibration_pattern);
-            }
-        });
     </script>
 </body>
 </html>
