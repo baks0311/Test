@@ -72,59 +72,45 @@
 
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
-                const sosMessage = {
-                    'app_type': 'sos_alert',
-                    'message': '🚨 ВНИМАНИЕ! Тревога!'
-                };
+                const sosMessage = JSON.stringify({
+                    message: 'play_alarm',
+                    sound: 'beep-11.mp3',
+                    vibration_pattern: [1000, 500, 1000] // вибрация
+                });
 
                 // Отправляем сообщение тревоги боту
-                window.Telegram.WebApp.sendData(JSON.stringify(sosMessage));
+                window.Telegram.WebApp.sendData(sosMessage);
                 console.log("Сообщение отправлено боту:", sosMessage);
+
+                // Включаем звук и вибрацию 3 раза по 10 секунд с паузой 2 секунды
+                let repeatCount = 3;
+                function playRepeatedAlarm() {
+                    if (repeatCount > 0) {
+                        playAlarmSound();
+                        navigator.vibrate([1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]); // 10 секунд вибрации
+                        console.log("Вибрация активирована.");
+                        setTimeout(() => {
+                            repeatCount--;
+                            if (repeatCount > 0) {
+                                setTimeout(playRepeatedAlarm, 2000); // пауза 2 сек
+                            }
+                        }, 10000); // продолжительность 10 сек
+                    }
+                }
+
+                // Запуск сигнала тревоги
+                playRepeatedAlarm();
             }
         }
 
         function playAlarmSound() {
-            // Используем аудиофайл с GitHub
+            // Замените ссылку на аудиофайл с новой ссылкой из вашего репозитория GitHub
             const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
-            audio.loop = true;  // Звук будет повторяться
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
             }).catch((error) => {
                 console.error("Ошибка воспроизведения звука:", error);
             });
-        }
-
-        // Обработчик для включения вибрации
-        function activateVibration(pattern) {
-            if (navigator.vibrate) {
-                navigator.vibrate(pattern);
-                console.log("Вибрация активирована:", pattern);
-            } else {
-                console.log("Вибрация недоступна на данном устройстве.");
-            }
-        }
-
-        // Функция для обработки команды на воспроизведение тревоги от бота
-        function handleAlarm(data) {
-            if (data.message === 'play_alarm') {
-                playAlarmSound();
-                activateVibration(data.vibration_pattern);
-            } else if (data.message === 'stop_alarm') {
-                stopAlarm();  // Функция для остановки звука и вибрации
-            }
-        }
-
-        // Слушаем событие от бота для воспроизведения сигнала тревоги и вибрации
-        window.Telegram.WebApp.onEvent('message', function(event) {
-            const data = JSON.parse(event.data);
-            handleAlarm(data);
-        });
-
-        function stopAlarm() {
-            const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
-            audio.pause();  // Остановить звук
-            navigator.vibrate(0);  // Остановить вибрацию
-            console.log("Звук и вибрация остановлены.");
         }
     </script>
 </body>
