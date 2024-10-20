@@ -50,10 +50,6 @@
     </div>
 
     <script>
-        let audio;
-        let vibrationInterval;
-        let stopSignal = false;
-
         window.addEventListener('load', function() {
             // Проверяем, что Telegram WebApp API доступен
             if (window.Telegram && window.Telegram.WebApp) {
@@ -76,66 +72,33 @@
 
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
-                const sosMessage = {
-                    app_type: 'sos_alert',
-                    message: "🚨 ВНИМАНИЕ! Тревога!"
-                };
+                const sosMessage = "🚨 ВНИМАНИЕ! Тревога!";
 
                 // Отправляем сообщение тревоги боту
-                window.Telegram.WebApp.sendData(JSON.stringify(sosMessage));
+                window.Telegram.WebApp.sendData(sosMessage);
                 console.log("Сообщение отправлено боту:", sosMessage);
 
-                // Включаем вибрацию устройства и звуковой сигнал на 30 секунд
-                startAlarm();
+                // Включаем вибрацию устройства
+                if (navigator.vibrate) {
+                    navigator.vibrate([1000, 500, 1000]);  // Вибрация с паузой
+                    console.log("Вибрация активирована.");
+                } else {
+                    console.log("Вибрация недоступна на данном устройстве.");
+                }
 
-                // Ожидаем сигнал от бота для остановки
-                window.Telegram.WebApp.onEvent('message', function(event) {
-                    if (event.message === 'stop_alarm') {
-                        stopAlarm();
-                    }
-                });
+                // Звонок (играем аудио сигнал тревоги)
+                playAlarmSound();
             }
         }
 
-        function startAlarm() {
-            // Воспроизводим звуковой сигнал
-            audio = new Audio('https://www.soundjay.com/buttons/sounds/beep-11.mp3');
-            audio.loop = true;
+        function playAlarmSound() {
+            // Замените ссылку на аудиофайл с новой ссылкой из вашего репозитория GitHub
+            const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
             audio.play().then(() => {
                 console.log("Аудиосигнал тревоги воспроизведен.");
             }).catch((error) => {
                 console.error("Ошибка воспроизведения звука:", error);
             });
-
-            // Вибрация с повторением на 30 секунд (только для поддерживаемых устройств)
-            if (navigator.vibrate) {
-                vibrationInterval = setInterval(() => {
-                    if (!stopSignal) {
-                        navigator.vibrate([1000, 500, 1000]);  // Вибрация с паузой
-                        console.log("Вибрация активирована.");
-                    }
-                }, 3000); // повтор каждые 3 секунды
-            } else {
-                console.log("Вибрация не поддерживается данным устройством.");
-            }
-
-            // Остановить сигнал через 30 секунд
-            setTimeout(stopAlarm, 30000); // Остановка через 30 секунд
-        }
-
-        function stopAlarm() {
-            stopSignal = true;
-            // Остановить звук
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-
-            // Остановить вибрацию
-            if (vibrationInterval) {
-                clearInterval(vibrationInterval);
-            }
-            console.log("Аудиосигнал и вибрация остановлены.");
         }
     </script>
 </body>
