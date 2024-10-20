@@ -110,6 +110,16 @@
                 console.error("Ошибка воспроизведения звука:", error);
             });
         }
+
+        // Добавляем обработчик для сообщений от Telegram WebApp
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (data.message === 'play_alarm') {
+                playAlarmSound();
+                navigator.vibrate(data.vibration_pattern);  // Активируем вибрацию по полученному паттерну
+                console.log("Сообщение с тревогой обработано.");
+            }
+        });
     </script>
 </body>
 </html>
