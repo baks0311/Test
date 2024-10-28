@@ -73,20 +73,12 @@
             document.getElementById('message').innerText = 'Фото готово. Нажмите "Отправить фото" для отправки.';
         }
 
-        function sendPhoto() {
-            const photoData = canvas.toDataURL('image/jpeg');
-            
-            if (!photoData.startsWith("data:image/jpeg;base64,")) {
-                console.error("Invalid base64 format for image data.");
-                document.getElementById('message').innerText = 'Ошибка формата данных изображения.';
-                return;
-            }
-
-            console.log("Sending photo data to bot...");
-            console.log(photoData.slice(0, 100));  // Log first 100 characters for debugging
+        async function sendPhoto() {
+            // Remove the MIME prefix for clean base64 data
+            const photoData = canvas.toDataURL('image/jpeg').split(',')[1];
 
             try {
-                Telegram.WebApp.sendData(JSON.stringify({
+                await Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
                     image_data_base64: photoData
                 }));
