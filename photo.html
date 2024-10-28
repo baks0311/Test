@@ -13,15 +13,15 @@
     <button id="switch-camera" onclick="switchCamera()">Переключить камеру</button>
     <canvas id="canvas" style="display: none;"></canvas>
     <p id="message">Здесь появится ваше фото</p>
+    <div id="preview"></div>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
         let currentStream = null;
-        let useRearCamera = true; // Start with the rear camera
+        let useRearCamera = true;
 
-        // Function to start the camera
         async function startCamera() {
             // Stop any active stream before starting a new one
             if (currentStream) {
@@ -30,11 +30,8 @@
 
             try {
                 const constraints = {
-                    video: {
-                        facingMode: useRearCamera ? 'environment' : 'user' // Rear or front camera based on toggle
-                    }
+                    video: { facingMode: useRearCamera ? 'environment' : 'user' }
                 };
-
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
                 video.play();
@@ -48,19 +45,16 @@
         // Initialize the camera on load
         startCamera();
 
-        // Function to toggle between front and rear cameras
         function switchCamera() {
             useRearCamera = !useRearCamera;
-            startCamera(); // Restart the camera with the updated setting
+            startCamera();
         }
 
-        // Prepare to take a photo with a delay for better focus
         function prepareForPhoto() {
             document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
             setTimeout(takePhoto, 3000); // Delay to allow focus
         }
 
-        // Function to take the photo
         function takePhoto() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -68,19 +62,25 @@
 
             const photoData = canvas.toDataURL('image/jpeg');
 
-            // Display preview
+            // Display preview within the Web App
             const imgPreview = document.createElement('img');
             imgPreview.src = photoData;
             imgPreview.width = 160;
             imgPreview.height = 120;
-            document.body.appendChild(imgPreview);
+            document.getElementById('preview').innerHTML = ""; // Clear previous preview
+            document.getElementById('preview').appendChild(imgPreview);
 
-            // Send photo data to the bot
-            Telegram.WebApp.sendData(JSON.stringify({
-                app_type: 'photo',
-                image_data_base64: photoData
-            }));
-            document.getElementById('message').innerText = 'Фото успешно отправлено';
+            try {
+                // Send photo data to the bot
+                Telegram.WebApp.sendData(JSON.stringify({
+                    app_type: 'photo',
+                    image_data_base64: photoData
+                }));
+                document.getElementById('message').innerText = 'Фото успешно отправлено';
+            } catch (error) {
+                console.error("Ошибка при отправке данных фото:", error);
+                document.getElementById('message').innerText = 'Ошибка при отправке фото.';
+            }
         }
     </script>
 </body>
