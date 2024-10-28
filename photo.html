@@ -12,7 +12,7 @@
     <button id="take-photo" onclick="prepareForPhoto()">Сфотографировать</button>
     <button id="switch-camera" onclick="switchCamera()">Переключить камеру</button>
     <canvas id="canvas" style="display: none;"></canvas>
-    <p id="message">Здесь появится ваше фото</p>
+    <p id="message">Камера запущена</p>
     <div id="preview"></div>
     <button id="confirm-photo" onclick="sendPhoto()" style="display: none;">Отправить фото</button>
 
@@ -75,6 +75,12 @@
 
         function sendPhoto() {
             const photoData = canvas.toDataURL('image/jpeg');
+            
+            if (!photoData.startsWith("data:image/jpeg;base64,")) {
+                console.error("Invalid base64 format for image data.");
+                document.getElementById('message').innerText = 'Ошибка формата данных изображения.';
+                return;
+            }
 
             try {
                 Telegram.WebApp.sendData(JSON.stringify({
