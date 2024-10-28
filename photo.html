@@ -14,16 +14,17 @@
     <canvas id="canvas" style="display: none;"></canvas>
     <p id="message">Здесь появится ваше фото</p>
     <div id="preview"></div>
+    <button id="confirm-photo" onclick="sendPhoto()" style="display: none;">Отправить фото</button>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
+        const preview = document.getElementById('preview');
         let currentStream = null;
         let useRearCamera = true;
 
         async function startCamera() {
-            // Stop any active stream before starting a new one
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
             }
@@ -42,7 +43,6 @@
             }
         }
 
-        // Initialize the camera on load
         startCamera();
 
         function switchCamera() {
@@ -62,21 +62,27 @@
 
             const photoData = canvas.toDataURL('image/jpeg');
 
-            // Display preview within the Web App
             const imgPreview = document.createElement('img');
             imgPreview.src = photoData;
             imgPreview.width = 160;
             imgPreview.height = 120;
-            document.getElementById('preview').innerHTML = ""; // Clear previous preview
-            document.getElementById('preview').appendChild(imgPreview);
+            preview.innerHTML = "";
+            preview.appendChild(imgPreview);
+
+            document.getElementById('confirm-photo').style.display = 'block';
+            document.getElementById('message').innerText = 'Фото готово. Нажмите "Отправить фото" для отправки.';
+        }
+
+        function sendPhoto() {
+            const photoData = canvas.toDataURL('image/jpeg');
 
             try {
-                // Send photo data to the bot
                 Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
                     image_data_base64: photoData
                 }));
                 document.getElementById('message').innerText = 'Фото успешно отправлено';
+                document.getElementById('confirm-photo').style.display = 'none';
             } catch (error) {
                 console.error("Ошибка при отправке данных фото:", error);
                 document.getElementById('message').innerText = 'Ошибка при отправке фото.';
