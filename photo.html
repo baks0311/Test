@@ -8,8 +8,9 @@
 </head>
 <body>
     <h1>Сделать фото или записать видео</h1>
-    <video id="video" width="320" height="240" autoplay></video>
+    <video id="video" width="320" height="240" autoplay playsinline></video>
     <button id="take-photo" onclick="prepareForPhoto()">Сфотографировать</button>
+    <button id="switch-camera" onclick="switchCamera()">Переключить камеру</button>
     <canvas id="canvas" style="display: none;"></canvas>
     <p id="message">Здесь появится ваше фото</p>
 
@@ -17,28 +18,49 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
-        let stream;
+        let currentStream = null;
+        let useRearCamera = true; // Start with the rear camera
 
-        // Получение доступа к задней камере устройства
+        // Function to start the camera
         async function startCamera() {
+            // Stop any active stream before starting a new one
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = stream;
+                const constraints = {
+                    video: {
+                        facingMode: useRearCamera ? 'environment' : 'user' // Rear or front camera based on toggle
+                    }
+                };
+
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+                video.play();
+                document.getElementById('message').innerText = "Камера запущена.";
             } catch (err) {
                 console.error("Ошибка доступа к камере: ", err);
                 document.getElementById('message').innerText = "Не удалось получить доступ к камере.";
             }
         }
 
+        // Initialize the camera on load
         startCamera();
 
-        // Функция для подготовки к съемке с задержкой для фокусировки
-        function prepareForPhoto() {
-            document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
-            setTimeout(takePhoto, 3000);
+        // Function to toggle between front and rear cameras
+        function switchCamera() {
+            useRearCamera = !useRearCamera;
+            startCamera(); // Restart the camera with the updated setting
         }
 
-        // Функция для захвата фото
+        // Prepare to take a photo with a delay for better focus
+        function prepareForPhoto() {
+            document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
+            setTimeout(takePhoto, 3000); // Delay to allow focus
+        }
+
+        // Function to take the photo
         function takePhoto() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -46,19 +68,18 @@
 
             const photoData = canvas.toDataURL('image/jpeg');
 
-            // Предварительный просмотр фото
+            // Display preview
             const imgPreview = document.createElement('img');
             imgPreview.src = photoData;
             imgPreview.width = 160;
             imgPreview.height = 120;
             document.body.appendChild(imgPreview);
 
-            // Отправляем данные с полем app_type
+            // Send photo data to the bot
             Telegram.WebApp.sendData(JSON.stringify({
                 app_type: 'photo',
                 image_data_base64: photoData
             }));
-
             document.getElementById('message').innerText = 'Фото успешно отправлено';
         }
     </script>
