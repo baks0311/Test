@@ -77,10 +77,14 @@
             // Remove the MIME prefix for clean base64 data
             const photoData = canvas.toDataURL('image/jpeg').split(',')[1];
 
+            // Log the data for debugging
+            console.log("Photo data length:", photoData.length);
+            console.log("Sending photo data...");
+
             try {
                 await Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
-                    image_data_base64: photoData
+                    image_data_base64: "data:image/jpeg;base64," + photoData  // Ensure format consistency
                 }));
                 document.getElementById('message').innerText = 'Фото успешно отправлено';
                 document.getElementById('confirm-photo').style.display = 'none';
