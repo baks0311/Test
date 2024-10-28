@@ -82,6 +82,9 @@
                 return;
             }
 
+            console.log("Sending photo data to bot...");
+            console.log(photoData.slice(0, 100));  // Log first 100 characters for debugging
+
             try {
                 Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
