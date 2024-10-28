@@ -7,28 +7,38 @@
     <title>Photo and Video App</title>
 </head>
 <body>
-    <h1>Take a Photo or Record a Video</h1>
+    <h1>Сделать фото или записать видео</h1>
     <video id="video" width="320" height="240" autoplay></video>
-    <button id="take-photo" onclick="takePhoto()">Сфотографировать</button>
+    <button id="take-photo" onclick="prepareForPhoto()">Сфотографировать</button>
     <canvas id="canvas" style="display: none;"></canvas>
-    <p id="message">Your photo will appear here</p>
+    <p id="message">Здесь появится ваше фото</p>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
+        let stream;
 
         // Получение доступа к задней камере устройства
-        navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'environment' }  // Используем заднюю камеру
-        })
-        .then(stream => {
-            video.srcObject = stream;
-        })
-        .catch(err => {
-            console.error("Ошибка доступа к камере: ", err);
-        });
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Ошибка доступа к камере: ", err);
+                document.getElementById('message').innerText = "Не удалось получить доступ к камере.";
+            }
+        }
 
+        startCamera();
+
+        // Функция для подготовки к съемке с задержкой для фокусировки
+        function prepareForPhoto() {
+            document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
+            setTimeout(takePhoto, 3000);
+        }
+
+        // Функция для захвата фото
         function takePhoto() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -36,11 +46,19 @@
 
             const photoData = canvas.toDataURL('image/jpeg');
 
+            // Предварительный просмотр фото
+            const imgPreview = document.createElement('img');
+            imgPreview.src = photoData;
+            imgPreview.width = 160;
+            imgPreview.height = 120;
+            document.body.appendChild(imgPreview);
+
             // Отправляем данные с полем app_type
             Telegram.WebApp.sendData(JSON.stringify({
                 app_type: 'photo',
                 image_data_base64: photoData
             }));
+
             document.getElementById('message').innerText = 'Фото успешно отправлено';
         }
     </script>
