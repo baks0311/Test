@@ -78,14 +78,17 @@
             const photoData = canvas.toDataURL('image/jpeg').split(',')[1];
 
             // Log the data for debugging
-            console.log("Photo data length:", photoData.length);
-            console.log("Sending photo data...");
+            console.log("Preparing data to send to bot:", {
+                app_type: 'photo',
+                image_data_base64: "data:image/jpeg;base64," + photoData
+            });
 
             try {
                 await Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
                     image_data_base64: "data:image/jpeg;base64," + photoData  // Ensure format consistency
                 }));
+                console.log("Data successfully sent to bot.");
                 document.getElementById('message').innerText = 'Фото успешно отправлено';
                 document.getElementById('confirm-photo').style.display = 'none';
             } catch (error) {
