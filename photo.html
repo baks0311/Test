@@ -52,7 +52,7 @@
 
         function prepareForPhoto() {
             document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
-            setTimeout(takePhoto, 3000); // Delay to allow focus
+            setTimeout(takePhoto, 3000);
         }
 
         function takePhoto() {
@@ -61,7 +61,6 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             const photoData = canvas.toDataURL('image/jpeg');
-
             const imgPreview = document.createElement('img');
             imgPreview.src = photoData;
             imgPreview.width = 160;
@@ -74,7 +73,10 @@
         }
 
         async function sendPhoto() {
-            // Remove the MIME prefix for clean base64 data
+            // Show a loading message while the photo is being sent
+            document.getElementById('message').innerText = 'Отправка фото...';
+            
+            // Prepare the photo for sending
             const photoData = canvas.toDataURL('image/jpeg').split(',')[1];
 
             // Log the data for debugging
@@ -86,14 +88,14 @@
             try {
                 await Telegram.WebApp.sendData(JSON.stringify({
                     app_type: 'photo',
-                    image_data_base64: "data:image/jpeg;base64," + photoData  // Ensure format consistency
+                    image_data_base64: "data:image/jpeg;base64," + photoData
                 }));
                 console.log("Data successfully sent to bot.");
                 document.getElementById('message').innerText = 'Фото успешно отправлено';
                 document.getElementById('confirm-photo').style.display = 'none';
             } catch (error) {
                 console.error("Ошибка при отправке данных фото:", error);
-                document.getElementById('message').innerText = 'Ошибка при отправке фото.';
+                document.getElementById('message').innerText = 'Ошибка при отправке фото. Попробуйте еще раз.';
             }
         }
     </script>
