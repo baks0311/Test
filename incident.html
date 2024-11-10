@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Выбор инцидента</title>
+    <title>Selectarea incidentului</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -28,40 +28,40 @@
     </style>
 </head>
 <body>
-    <h1>Выберите тип инцидента</h1>
-    <div class="incident" onclick="sendIncident('Пожар')">
-        <img src="campfire.png" alt="Пожар">
-        <span>Пожар</span>
+    <h1>Alegeți tipul de incident</h1>
+    <div class="incident" onclick="sendIncident('Incendiu')">
+        <img src="campfire.png" alt="Incendiu">
+        <span>Incendiu</span>
     </div>
-    <div class="incident" onclick="sendIncident('Ограбление')">
-        <img src="zone.png" alt="Ограбление">
-        <span>Ограбление</span>
+    <div class="incident" onclick="sendIncident('Jaf')">
+        <img src="zone.png" alt="Jaf">
+        <span>Jaf</span>
     </div>
-    <div class="incident" onclick="sendIncident('Проникновение')">
-        <img src="free-diving.png" alt="Проникновение">
-        <span>Проникновение</span>
+    <div class="incident" onclick="sendIncident('Intrare neautorizată')">
+        <img src="free-diving.png" alt="Intrare neautorizată">
+        <span>Intrare neautorizată</span>
     </div>
-    <div class="incident" onclick="sendIncident('Протест')">
-        <img src="protest.png" alt="Протест">
-        <span>Протест</span>
+    <div class="incident" onclick="sendIncident('Protest')">
+        <img src="protest.png" alt="Protest">
+        <span>Protest</span>
     </div>
-    <div class="incident" onclick="sendIncident('Конфликт')">
-        <img src="conflict.png" alt="Конфликт">
-        <span>Конфликт</span>
+    <div class="incident" onclick="sendIncident('Conflict')">
+        <img src="conflict.png" alt="Conflict">
+        <span>Conflict</span>
     </div>
-    <div class="incident" onclick="sendIncident('Ремонт')">
-        <img src="repair.png" alt="Ремонт">
-        <span>Ремонт</span>
+    <div class="incident" onclick="sendIncident('Reparație')">
+        <img src="repair.png" alt="Reparație">
+        <span>Reparație</span>
     </div>
     
     <script>
         function sendIncident(incident) {
-            // Подготовка данных для отправки
+            // Pregătirea datelor pentru trimitere
             const data = {
-                app_type: 'incident',  // Указываем тип данных
-                incident_type: incident // Указываем тип инцидента
+                app_type: 'incident',  // Specificăm tipul de date
+                incident_type: incident // Specificăm tipul incidentului
             };
-            // Отправляем данные обратно боту
+            // Trimitem datele înapoi la bot
             Telegram.WebApp.sendData(JSON.stringify(data));
         }
     </script>
