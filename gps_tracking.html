@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отслеживание геопозиции</title>
+    <title>Urmărirea locației</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1>Отслеживание вашего местоположения включено</h1>
-    <div id="status">Ожидание координат...</div>
+    <h1>Urmărirea locației dvs. este activată</h1>
+    <div id="status">Așteptare coordonate...</div>
 
     <script>
-        // Function to send data to bot
+        // Funcția pentru a trimite datele la bot
         function sendLocationToBot(latitude, longitude) {
             const locationData = {
-                app_type: 'gps', // Specify app_type as 'gps' for correct processing on the bot side
+                app_type: 'gps', // Specificați app_type ca 'gps' pentru procesarea corectă pe partea botului
                 latitude: latitude,
                 longitude: longitude
             };
-            // Send data in JSON format to the bot
+            // Trimiteți datele în format JSON la bot
             Telegram.WebApp.sendData(JSON.stringify(locationData));
-            console.log("Данные отправлены в бота:", locationData);
+            console.log("Date trimise la bot:", locationData);
         }
 
-        // Function to track location
+        // Funcția pentru a urmări locația
         function startTrackingLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(
@@ -31,38 +31,38 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
 
-                        // Update status display with coordinates
-                        document.getElementById("status").innerText = `Координаты: ${latitude}, ${longitude}`;
+                        // Actualizați afișajul statusului cu coordonate
+                        document.getElementById("status").innerText = `Coordonate: ${latitude}, ${longitude}`;
 
-                        // Send coordinates to the bot
+                        // Trimiteți coordonatele la bot
                         sendLocationToBot(latitude, longitude);
                     },
                     function (error) {
-                        console.error("Ошибка при получении геопозиции:", error);
-                        document.getElementById("status").innerText = "Ошибка при получении геопозиции";
+                        console.error("Eroare la obținerea locației:", error);
+                        document.getElementById("status").innerText = "Eroare la obținerea locației";
                     },
                     {
-                        enableHighAccuracy: true, // High accuracy
-                        maximumAge: 0,            // Do not cache coordinates
-                        timeout: 5000             // Timeout for coordinate retrieval
+                        enableHighAccuracy: true, // Precizie mare
+                        maximumAge: 0,            // Nu cacheați coordonatele
+                        timeout: 5000             // Timeout pentru obținerea coordonatelor
                     }
                 );
             } else {
-                document.getElementById("status").innerText = "Геолокация не поддерживается вашим устройством.";
+                document.getElementById("status").innerText = "Geolocația nu este suportată de dispozitivul dvs.";
             }
         }
 
-        // Check WebApp readiness and start location tracking upon page load
+        // Verificați disponibilitatea WebApp și începeți urmărirea locației la încărcarea paginii
         window.addEventListener('load', function() {
             if (window.Telegram && window.Telegram.WebApp) {
-                console.log("Telegram WebApp API инициализировано.");
-                Telegram.WebApp.ready(); // Notify that WebApp is ready
+                console.log("API Telegram WebApp inițializat.");
+                Telegram.WebApp.ready(); // Notificați că WebApp este gata
 
-                // Start tracking
+                // Porniți urmărirea
                 startTrackingLocation();
             } else {
-                alert('Telegram WebApp API недоступен. Убедитесь, что приложение запущено внутри Telegram.');
-                console.log('Ошибка: Telegram WebApp API не найдено.');
+                alert('API Telegram WebApp nu este disponibil. Asigurați-vă că aplicația este lansată în Telegram.');
+                console.log('Eroare: API Telegram WebApp nu a fost găsit.');
             }
         });
     </script>
