@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram SOS Alarm</title>
 
-    <!-- Подключаем telegram-web-app.js для работы с Telegram WebApp API -->
+    <!-- Conectăm telegram-web-app.js pentru a lucra cu Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
@@ -45,43 +45,43 @@
 </head>
 <body>
     <div class="container">
-        <h1>Нажмите "SOS" для отправки тревоги</h1>
+        <h1>Apăsați "SOS" pentru a trimite o alertă</h1>
         <button id="sos-button" disabled>SOS</button>
     </div>
 
     <script>
         window.addEventListener('load', function() {
-            // Проверяем, что Telegram WebApp API доступен
+            // Verificăm dacă Telegram WebApp API este disponibil
             if (window.Telegram && window.Telegram.WebApp) {
-                console.log("Telegram WebApp API инициализировано.");
-                window.Telegram.WebApp.ready();  // Готовим WebApp
+                console.log("Telegram WebApp API inițializat.");
+                window.Telegram.WebApp.ready();  // Pregătim WebApp
 
-                // Активируем кнопку SOS
+                // Activăm butonul SOS
                 const sosButton = document.getElementById('sos-button');
                 sosButton.disabled = false;
 
-                // Добавляем событие на кнопку для отправки тревоги
+                // Adăugăm eveniment pe buton pentru a trimite alerta
                 sosButton.addEventListener('click', function() {
                     sendSOSAlert();
                 });
             } else {
-                alert('Telegram WebApp API недоступен. Убедитесь, что WebApp запущен внутри Telegram.');
-                console.log('Ошибка: Telegram WebApp API не найдено.');
+                alert('Telegram WebApp API indisponibil. Asigurați-vă că WebApp-ul este lansat în Telegram.');
+                console.log('Eroare: Telegram WebApp API nu a fost găsit.');
             }
         });
 
         function sendSOSAlert() {
             if (window.Telegram && window.Telegram.WebApp) {
                 const sosMessage = JSON.stringify({
-                    message: "🚨 ВНИМАНИЕ! Тревога!",
+                    message: "🚨 ATENȚIE! Alertă!",
                     app_type: "sos_alert"
                 });
 
-                // Отправляем сообщение тревоги боту
+                // Trimitem mesajul de alertă către bot
                 window.Telegram.WebApp.sendData(sosMessage);
-                console.log("Сообщение отправлено боту:", sosMessage);
+                console.log("Mesaj trimis botului:", sosMessage);
 
-                // Включаем звук и вибрацию
+                // Activăm sunetul și vibrația
                 playRepeatedAlarm();
             }
         }
@@ -91,10 +91,10 @@
             function playAlarm() {
                 if (repeatCount > 0) {
                     playAlarmSound();
-                    navigator.vibrate([1000, 500, 1000]); // Вибрация
-                    console.log("Вибрация активирована.");
+                    navigator.vibrate([1000, 500, 1000]); // Vibrație
+                    console.log("Vibrația este activată.");
                     repeatCount--;
-                    setTimeout(playAlarm, 2000);  // Пауза между сигналами
+                    setTimeout(playAlarm, 2000);  // Pauză între semnale
                 }
             }
             playAlarm();
@@ -103,9 +103,9 @@
         function playAlarmSound() {
             const audio = new Audio('https://baks0311.github.io/Test/beep-11.mp3');
             audio.play().then(() => {
-                console.log("Аудиосигнал тревоги воспроизведен.");
+                console.log("Semnalul sonor de alarmă a fost redat.");
             }).catch((error) => {
-                console.error("Ошибка воспроизведения звука:", error);
+                console.error("Eroare la redarea sunetului:", error);
             });
         }
     </script>
