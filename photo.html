@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Photo and Video App</title>
+    <title>Aplicație foto și video</title>
 </head>
 <body>
-    <h1>Сделать фото или записать видео</h1>
+    <h1>Faceți o fotografie sau înregistrați un videoclip</h1>
     <video id="video" width="320" height="240" autoplay playsinline></video>
-    <button id="take-photo" onclick="prepareForPhoto()">Сфотографировать</button>
-    <button id="switch-camera" onclick="switchCamera()">Переключить камеру</button>
+    <button id="take-photo" onclick="prepareForPhoto()">Fotografiați</button>
+    <button id="switch-camera" onclick="switchCamera()">Schimbați camera</button>
     <canvas id="canvas" style="display: none;"></canvas>
-    <p id="message">Камера запущена</p>
+    <p id="message">Camera este pornită</p>
     <div id="preview"></div>
-    <button id="confirm-photo" onclick="sendPhoto()" style="display: none;">Отправить фото</button>
+    <button id="confirm-photo" onclick="sendPhoto()" style="display: none;">Trimiteți fotografia</button>
 
     <script>
         const video = document.getElementById('video');
@@ -36,10 +36,10 @@
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
                 video.play();
-                document.getElementById('message').innerText = "Камера запущена.";
+                document.getElementById('message').innerText = "Camera este pornită.";
             } catch (err) {
-                console.error("Ошибка доступа к камере: ", err);
-                document.getElementById('message').innerText = "Не удалось получить доступ к камере.";
+                console.error("Eroare de acces la cameră: ", err);
+                document.getElementById('message').innerText = "Nu s-a reușit accesarea camerei.";
             }
         }
 
@@ -51,8 +51,8 @@
         }
 
         function prepareForPhoto() {
-            document.getElementById('message').innerText = "Удерживайте устройство устойчиво. Фото будет сделано через 3 секунды.";
-            setTimeout(takePhoto, 3000); // Delay to allow focus
+            document.getElementById('message').innerText = "Țineți dispozitivul stabil. Fotografia va fi făcută în 3 secunde.";
+            setTimeout(takePhoto, 3000); // Pauză pentru focalizare
         }
 
         function takePhoto() {
@@ -70,17 +70,17 @@
             preview.appendChild(imgPreview);
 
             document.getElementById('confirm-photo').style.display = 'block';
-            document.getElementById('message').innerText = 'Фото готово. Нажмите "Отправить фото" для отправки.';
+            document.getElementById('message').innerText = 'Fotografia este gata. Apăsați "Trimiteți fotografia" pentru a o trimite.';
         }
 
         async function sendPhoto() {
-            // Show a loading message while the photo is being sent
-            document.getElementById('message').innerText = 'Отправка фото...';
+            // Afișează un mesaj de încărcare în timpul trimiterii
+            document.getElementById('message').innerText = 'Trimiterea fotografiei...';
 
-            // Prepare the photo for sending
+            // Pregătiți fotografia pentru trimitere
             const photoData = canvas.toDataURL('image/jpeg').split(',')[1];
 
-            console.log("Preparing data to send to bot:", {
+            console.log("Pregătirea datelor pentru trimiterea către bot:", {
                 app_type: 'photo',
                 image_data_base64: "data:image/jpeg;base64," + photoData
             });
@@ -90,12 +90,12 @@
                     app_type: 'photo',
                     image_data_base64: "data:image/jpeg;base64," + photoData
                 }));
-                console.log("Data successfully sent to bot.");
-                document.getElementById('message').innerText = 'Фото успешно отправлено';
+                console.log("Date trimise cu succes către bot.");
+                document.getElementById('message').innerText = 'Fotografia a fost trimisă cu succes';
                 document.getElementById('confirm-photo').style.display = 'none';
             } catch (error) {
-                console.error("Ошибка при отправке данных фото:", error);
-                document.getElementById('message').innerText = 'Ошибка при отправке фото. Попробуйте еще раз.';
+                console.error("Eroare la trimiterea fotografiei:", error);
+                document.getElementById('message').innerText = 'Eroare la trimiterea fotografiei. Încercați din nou.';
             }
         }
     </script>
