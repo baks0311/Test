@@ -47,12 +47,27 @@
     </div>
 
     <script>
+        let route_id = null;
+        let checkpoints = [];
+
         window.addEventListener('load', function () {
+            // Ensure Telegram WebApp is initialized
             if (window.Telegram && window.Telegram.WebApp) {
-                console.log("Telegram WebApp initialized.");
+                console.log("Telegram WebApp API initialized.");
                 window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.setHeaderColor("#ffffff");
 
+                // Extract dynamic data from initDataUnsafe
+                const initData = window.Telegram.WebApp.initDataUnsafe;
+                if (initData && initData.route_id) {
+                    route_id = initData.route_id;
+                    checkpoints = initData.checkpoints || [];
+                    console.log("Loaded route and checkpoints:", route_id, checkpoints);
+                } else {
+                    alert("Route data is missing. Please start the patrol first.");
+                }
+
+                // Enable scan button
                 const scanButton = document.getElementById('scan-button');
                 scanButton.disabled = false;
 
@@ -65,36 +80,45 @@
         });
 
         function scanQRCode() {
+            // Ensure route and checkpoints are available
+            if (!route_id || checkpoints.length === 0) {
+                console.error("Route ID or checkpoints are missing.");
+                alert("Please start the patrol and select a route first.");
+                return;
+            }
+
+            // Check if QR scanning popup is available
             if (window.Telegram.WebApp.showScanQrPopup) {
                 console.log('Opening QR code scanning popup...');
                 window.Telegram.WebApp.showScanQrPopup({
                     text: 'Scan the QR Code'
                 });
 
+                // Handle QR text received event
                 window.Telegram.WebApp.onEvent('qrTextReceived', function (event) {
                     const qrText = event.data;
 
-                    // Example: Replace with dynamic checkpoint ID retrieval logic
-                    const checkpoint_id = window.Telegram.WebApp.initDataUnsafe?.checkpoint_id || null;
-                    const route_id = window.Telegram.WebApp.initDataUnsafe?.route_id || null;
-
-                    if (!checkpoint_id || !route_id) {
-                        console.error("Checkpoint ID or Route ID is missing.");
-                        alert("Please start the patrol and select a route first.");
+                    // Match scanned QR code with checkpoints
+                    const checkpoint = checkpoints.find(cp => cp.name === qrText);
+                    if (!checkpoint) {
+                        alert("Invalid checkpoint scanned. Please try again.");
                         return;
                     }
 
+                    // Prepare data to send to bot
                     const data = {
                         app_type: "qr_code",
                         qr_code: qrText,
                         route_id: route_id,
-                        checkpoint_id: checkpoint_id
+                        checkpoint_id: checkpoint.id
                     };
 
+                    console.log("Sending data to bot:", data);
                     window.Telegram.WebApp.sendData(JSON.stringify(data));
                     window.Telegram.WebApp.closeScanQrPopup();
                 });
 
+                // Handle QR scanning popup closed event
                 window.Telegram.WebApp.onEvent('scanQrPopupClosed', function () {
                     console.log('QR code scanning popup closed.');
                 });
