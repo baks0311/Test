@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
-    
-    <!-- Conectăm telegram-web-app.js pentru a lucra cu API-ul Telegram WebApp -->
+
+    <!-- Connect telegram-web-app.js for Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
@@ -45,68 +45,74 @@
 </head>
 <body>
     <div class="container">
-        <h1>Apăsați butonul pentru a scana codul QR</h1>
-        <button id="scan-button" disabled>Scanează codul QR</button>
+        <h1>Press the button to scan a QR code</h1>
+        <button id="scan-button" disabled>Scan QR Code</button>
     </div>
 
     <script>
-        window.addEventListener('load', function() {
-            // Verificăm inițializarea API-ului Telegram WebApp
+        window.addEventListener('load', function () {
+            // Check if Telegram WebApp API is initialized
             if (window.Telegram && window.Telegram.WebApp) {
-                console.log("API Telegram WebApp inițializat.");
-                window.Telegram.WebApp.ready();  // Pregătim WebApp
+                console.log("Telegram WebApp API initialized.");
+                window.Telegram.WebApp.ready(); // Prepare WebApp
 
-                // Setăm culoarea principală a temei
+                // Set theme color
                 window.Telegram.WebApp.setHeaderColor("#ffffff");
 
-                // Activăm butonul de scanare
+                // Enable scan button
                 const scanButton = document.getElementById('scan-button');
                 scanButton.disabled = false;
 
-                // Adăugăm evenimentul de scanare a codurilor QR pe buton
-                scanButton.addEventListener('click', function() {
+                // Add QR code scanning event to the button
+                scanButton.addEventListener('click', function () {
                     scanQRCode();
                 });
             } else {
-                alert('API-ul Telegram WebApp nu este disponibil. Asigurați-vă că WebApp-ul este lansat în Telegram.');
-                console.log('Eroare: API-ul Telegram WebApp nu a fost găsit.');
+                alert('Telegram WebApp API is not available. Make sure the WebApp is launched in Telegram.');
+                console.log('Error: Telegram WebApp API not found.');
             }
         });
 
         function scanQRCode() {
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
-                console.log('Deschiderea ferestrei pentru scanarea codului QR...');
-                
-                // Apelul funcției pentru afișarea ferestrei de scanare QR
+                console.log('Opening QR code scanning popup...');
+
+                // Call function to show QR scanning popup
                 window.Telegram.WebApp.showScanQrPopup({
-                    text: 'Scanează codul QR'
+                    text: 'Scan the QR Code'
                 });
 
-                // Gestionarea evenimentului de scanare reușită a codului QR
-                window.Telegram.WebApp.onEvent('qrTextReceived', function(event) {
+                // Handle successful QR code scan
+                window.Telegram.WebApp.onEvent('qrTextReceived', function (event) {
                     const qrText = event.data;
-                    console.log('Codul QR a fost scanat cu succes:', qrText);
+                    console.log('QR Code successfully scanned:', qrText);
 
-                    // Creăm datele în format JSON cu câmpul app_type și qr_code
+                    // Add route_id and checkpoint_id dynamically
+                    const route_id = 1; // Replace with actual dynamic route ID
+                    const checkpoint_id = 101; // Replace with actual dynamic checkpoint ID
+
+                    // Create JSON data with required fields
                     const data = {
                         app_type: "qr_code",
-                        qr_code: qrText
+                        qr_code: qrText,
+                        route_id: route_id,
+                        checkpoint_id: checkpoint_id
                     };
 
-                    // Trimitem datele către bot
+                    // Send data to bot
                     window.Telegram.WebApp.sendData(JSON.stringify(data));
 
-                    // Închidem fereastra de scanare
+                    // Close the scanning popup
                     window.Telegram.WebApp.closeScanQrPopup();
                 });
 
-                // Gestionarea închiderii ferestrei de scanare
-                window.Telegram.WebApp.onEvent('scanQrPopupClosed', function() {
-                    console.log('Scanarea codului QR a fost finalizată sau anulată.');
+                // Handle scanning popup close event
+                window.Telegram.WebApp.onEvent('scanQrPopupClosed', function () {
+                    console.log('QR code scanning has been completed or canceled.');
                 });
             } else {
-                alert('Scanarea codurilor QR nu este disponibilă. Verificați că WebApp-ul este lansat în Telegram.');
-                console.log('Eroare: Funcția showScanQrPopup nu este disponibilă.');
+                alert('QR code scanning is not available. Ensure the WebApp is launched in Telegram.');
+                console.log('Error: showScanQrPopup function is not available.');
             }
         }
     </script>
