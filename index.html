@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram QR Scanner</title>
-
-    <!-- Connect telegram-web-app.js for Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,47 +48,42 @@
 
     <script>
         window.addEventListener('load', function () {
-            // Check if Telegram WebApp API is initialized
             if (window.Telegram && window.Telegram.WebApp) {
-                console.log("Telegram WebApp API initialized.");
-                window.Telegram.WebApp.ready(); // Prepare WebApp
-
-                // Set theme color
+                console.log("Telegram WebApp initialized.");
+                window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.setHeaderColor("#ffffff");
 
-                // Enable scan button
                 const scanButton = document.getElementById('scan-button');
                 scanButton.disabled = false;
 
-                // Add QR code scanning event to the button
                 scanButton.addEventListener('click', function () {
                     scanQRCode();
                 });
             } else {
-                alert('Telegram WebApp API is not available. Make sure the WebApp is launched in Telegram.');
-                console.log('Error: Telegram WebApp API not found.');
+                alert('Telegram WebApp API is not available.');
             }
         });
 
         function scanQRCode() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showScanQrPopup) {
+            if (window.Telegram.WebApp.showScanQrPopup) {
                 console.log('Opening QR code scanning popup...');
-
-                // Call function to show QR scanning popup
                 window.Telegram.WebApp.showScanQrPopup({
                     text: 'Scan the QR Code'
                 });
 
-                // Handle successful QR code scan
                 window.Telegram.WebApp.onEvent('qrTextReceived', function (event) {
                     const qrText = event.data;
-                    console.log('QR Code successfully scanned:', qrText);
 
-                    // Add route_id and checkpoint_id dynamically
-                    const route_id = 1; // Replace with actual dynamic route ID
-                    const checkpoint_id = 101; // Replace with actual dynamic checkpoint ID
+                    // Example: Replace with dynamic checkpoint ID retrieval logic
+                    const checkpoint_id = window.Telegram.WebApp.initDataUnsafe?.checkpoint_id || null;
+                    const route_id = window.Telegram.WebApp.initDataUnsafe?.route_id || null;
 
-                    // Create JSON data with required fields
+                    if (!checkpoint_id || !route_id) {
+                        console.error("Checkpoint ID or Route ID is missing.");
+                        alert("Please start the patrol and select a route first.");
+                        return;
+                    }
+
                     const data = {
                         app_type: "qr_code",
                         qr_code: qrText,
@@ -99,20 +91,15 @@
                         checkpoint_id: checkpoint_id
                     };
 
-                    // Send data to bot
                     window.Telegram.WebApp.sendData(JSON.stringify(data));
-
-                    // Close the scanning popup
                     window.Telegram.WebApp.closeScanQrPopup();
                 });
 
-                // Handle scanning popup close event
                 window.Telegram.WebApp.onEvent('scanQrPopupClosed', function () {
-                    console.log('QR code scanning has been completed or canceled.');
+                    console.log('QR code scanning popup closed.');
                 });
             } else {
-                alert('QR code scanning is not available. Ensure the WebApp is launched in Telegram.');
-                console.log('Error: showScanQrPopup function is not available.');
+                alert('QR code scanning is not available.');
             }
         }
     </script>
