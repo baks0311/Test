@@ -23,8 +23,15 @@
       font-weight: bold;
     }
 
-    .category {
-      margin: 20px 0 10px 0;
+    .section {
+      margin: 16px 0;
+      background-color: #e9eef6;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .section-title {
+      margin: 10px 0;
       padding-left: 16px;
       font-size: 18px;
       font-weight: bold;
@@ -34,10 +41,10 @@
     .incident {
       background-color: #ffffff;
       margin: 8px 12px;
-      padding: 15px;
-      font-size: 18px;
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 14px;
+      font-size: 17px;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       cursor: pointer;
@@ -49,8 +56,24 @@
     }
 
     .emoji {
-      font-size: 24px;
-      margin-right: 14px;
+      font-size: 22px;
+      margin-right: 12px;
+    }
+
+    .more-button {
+      background-color: #284b63;
+      color: white;
+      margin: 20px auto;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-align: center;
+      width: 200px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -58,27 +81,45 @@
 
 <header>🛡️ Raportează un incident</header>
 
-<div class="category">🔥 Situații de urgență</div>
-<div class="incident" onclick="sendIncident('Incendiu')"><span class="emoji">🔥</span> Incendiu</div>
-<div class="incident" onclick="sendIncident('Explozie')"><span class="emoji">💥</span> Explozie</div>
-<div class="incident" onclick="sendIncident('Scurgere gaze')"><span class="emoji">🧪</span> Scurgere gaze</div>
+<div class="section">
+  <div class="section-title">🔥 Situații de urgență</div>
+  <div class="incident" onclick="sendIncident('Incendiu')"><span class="emoji">🔥</span> Incendiu</div>
+  <div class="incident" onclick="sendIncident('Explozie')"><span class="emoji">💥</span> Explozie</div>
+  <div class="incident" onclick="sendIncident('Scurgere gaze')"><span class="emoji">🧪</span> Scurgere gaze</div>
+</div>
 
-<div class="category">🔒 Acces neautorizat</div>
-<div class="incident" onclick="sendIncident('Intrare neautorizată')"><span class="emoji">🚷</span> Intrare neautorizată</div>
-<div class="incident" onclick="sendIncident('Sigiliu compromis')"><span class="emoji">🔏</span> Sigiliu compromis</div>
+<div class="section">
+  <div class="section-title">🔒 Acces neautorizat</div>
+  <div class="incident" onclick="sendIncident('Intrare neautorizată')"><span class="emoji">🚷</span> Intrare neautorizată</div>
+  <div class="incident" onclick="sendIncident('Sigiliu compromis')"><span class="emoji">🔏</span> Sigiliu compromis</div>
+</div>
 
-<div class="category">🚨 Amenințări criminale</div>
-<div class="incident" onclick="sendIncident('Jaf')"><span class="emoji">💰</span> Jaf</div>
-<div class="incident" onclick="sendIncident('Răpire')"><span class="emoji">🚨</span> Răpire</div>
-<div class="incident" onclick="sendIncident('Persoane suspecte')"><span class="emoji">🕵️</span> Persoane suspecte</div>
+<div class="more-button" onclick="toggleMore()">➕ Vezi mai multe</div>
 
-<div class="category">📸 Supraveghere ilegală</div>
-<div class="incident" onclick="sendIncident('Dronă')"><span class="emoji">🛸</span> Dronă</div>
-<div class="incident" onclick="sendIncident('Fotografiere')"><span class="emoji">📸</span> Fotografiere</div>
+<div id="moreSection" class="hidden">
 
-<div class="category">🌪️ Dezastru natural</div>
-<div class="incident" onclick="sendIncident('Cutremur')"><span class="emoji">🌍</span> Cutremur</div>
-<div class="incident" onclick="sendIncident('Inundație')"><span class="emoji">🌊</span> Inundație</div>
+  <div class="section">
+    <div class="section-title">🚨 Amenințări criminale</div>
+    <div class="incident" onclick="sendIncident('Jaf')"><span class="emoji">💰</span> Jaf</div>
+    <div class="incident" onclick="sendIncident('Răpire')"><span class="emoji">🚨</span> Răpire</div>
+    <div class="incident" onclick="sendIncident('Persoane suspecte')"><span class="emoji">🕵️</span> Persoane suspecte</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🌊 Dezastru natural</div>
+    <div class="incident" onclick="sendIncident('Cutremur')"><span class="emoji">🌍</span> Cutremur</div>
+    <div class="incident" onclick="sendIncident('Inundație')"><span class="emoji">🌊</span> Inundație</div>
+    <div class="incident" onclick="sendIncident('Uragan')"><span class="emoji">🌪️</span> Uragan</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📸 Supraveghere</div>
+    <div class="incident" onclick="sendIncident('Dronă')"><span class="emoji">🛸</span> Dronă</div>
+    <div class="incident" onclick="sendIncident('Fotografiere')"><span class="emoji">📸</span> Fotografiere</div>
+    <div class="incident" onclick="sendIncident('Filmare')"><span class="emoji">🎥</span> Filmare</div>
+  </div>
+
+</div>
 
 <script>
   function sendIncident(incident) {
@@ -87,6 +128,11 @@
       incident_type: incident
     };
     Telegram.WebApp.sendData(JSON.stringify(data));
+  }
+
+  function toggleMore() {
+    const section = document.getElementById("moreSection");
+    section.classList.toggle("hidden");
   }
 </script>
 
