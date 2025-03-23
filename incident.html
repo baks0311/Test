@@ -1,41 +1,156 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Selectarea incidentului</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 50px;
+      margin: 20px;
     }
     .incident {
       display: block;
-      margin: 15px auto;
+      margin: 8px auto;
       padding: 10px 20px;
       border: 1px solid #ccc;
       border-radius: 10px;
-      max-width: 250px;
-      font-size: 18px;
+      max-width: 320px;
+      font-size: 16px;
       cursor: pointer;
       transition: background-color 0.2s;
     }
     .incident:hover {
       background-color: #f0f0f0;
     }
+    h2 {
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
   <h1>Alegeți tipul de incident</h1>
 
-  <div class="incident" onclick="sendIncident('Incendiu')">🔥 Incendiu</div>
+  <!-- 🔒 Crimă -->
+  <h2>🔒 Amenințări criminale</h2>
   <div class="incident" onclick="sendIncident('Jaf')">💰 Jaf</div>
+  <div class="incident" onclick="sendIncident('Atac')">🔪 Atac</div>
+  <div class="incident" onclick="sendIncident('Răpire')">🚨 Răpire</div>
+  <div class="incident" onclick="sendIncident('Terorism')">💣 Terorism</div>
+  <div class="incident" onclick="sendIncident('Înșelătorie')">🕵️ Înșelătorie</div>
+  <div class="incident" onclick="sendIncident('Crimă cibernetică')">💻 Crimă cibernetică</div>
   <div class="incident" onclick="sendIncident('Intrare neautorizată')">🚷 Intrare neautorizată</div>
+  <div class="incident" onclick="sendIncident('Obiecte sau persoane suspecte')">🔍 Obiecte/persoane suspecte</div>
+
+  <!-- ⚠️ Dezordine -->
+  <h2>⚠️ Dezordine publică</h2>
   <div class="incident" onclick="sendIncident('Protest')">📢 Protest</div>
-  <div class="incident" onclick="sendIncident('Conflict')">⚠️ Conflict</div>
-  <div class="incident" onclick="sendIncident('Reparație')">🔧 Reparație</div>
+  <div class="incident" onclick="sendIncident('Grevă')">✊ Grevă</div>
+  <div class="incident" onclick="sendIncident('Demonstrație')">📣 Demonstrație</div>
+  <div class="incident" onclick="sendIncident('Revoltă')">🔥 Revoltă</div>
+  <div class="incident" onclick="sendIncident('Ocuparea clădirii')">🏢 Ocuparea clădirii</div>
+  <div class="incident" onclick="sendIncident('Blocarea drumurilor')">🚧 Blocarea drumurilor</div>
+
+  <!-- 🛰️ Observație -->
+  <h2>🛰️ Supraveghere și colectare informații</h2>
+  <div class="incident" onclick="sendIncident('Dronă')">🛸 Utilizarea dronei</div>
+  <div class="incident" onclick="sendIncident('Fotografiere')">📸 Fotografiere</div>
+  <div class="incident" onclick="sendIncident('Filmări')">🎥 Filmări</div>
+
+  <!-- 🚗 Transport -->
+  <h2>🚗 Incidente de transport</h2>
+  <div class="incident" onclick="sendIncident('Accident rutier')">🚗 Accident rutier</div>
+  <div class="incident" onclick="sendIncident('Accident feroviar')">🚆 Accident feroviar</div>
+  <div class="incident" onclick="sendIncident('Lovirea pietonului')">🚶‍♂️ Lovire pieton</div>
+  <div class="incident" onclick="sendIncident('Furt auto')">🚙 Furt auto</div>
+  <div class="incident" onclick="sendIncident('Defecțiune auto')">🛠️ Defecțiune auto</div>
+  <div class="incident" onclick="sendIncident('Defecțiune drum')">🛤️ Infrastructură deteriorată</div>
+
+  <!-- 🌪️ Natură -->
+  <h2>🌪️ Dezastre naturale</h2>
+  <div class="incident" onclick="sendIncident('Cutremur')">🌍 Cutremur</div>
+  <div class="incident" onclick="sendIncident('Inundație')">🌊 Inundație</div>
+  <div class="incident" onclick="sendIncident('Uragan')">🌀 Uragan</div>
+  <div class="incident" onclick="sendIncident('Alunecare de teren')">🏔️ Alunecare de teren</div>
+  <div class="incident" onclick="sendIncident('Incendiu forestier')">🔥 Incendiu forestier</div>
+  <div class="incident" onclick="sendIncident('Tsunami')">🌊 Tsunami</div>
+  <div class="incident" onclick="sendIncident('Erupție vulcanică')">🌋 Erupție vulcanică</div>
+
+  <!-- 🏭 Avarii -->
+  <h2>🏭 Avarii la locul de muncă</h2>
+  <div class="incident" onclick="sendIncident('Incendiu')">🔥 Incendiu</div>
+  <div class="incident" onclick="sendIncident('Explozie')">💥 Explozie</div>
+  <div class="incident" onclick="sendIncident('Scurgere gaze')">🧪 Scurgere de gaze/chimicale</div>
+  <div class="incident" onclick="sendIncident('Furt echipament')">🔧 Furt echipament</div>
+  <div class="incident" onclick="sendIncident('Defecțiune echipament')">🛠️ Defecțiune echipament</div>
+  <div class="incident" onclick="sendIncident('Prăbușire clădire')">🏚️ Prăbușire clădire</div>
+  <div class="incident" onclick="sendIncident('Inundație incintă')">🚿 Inundație incintă</div>
+  <div class="incident" onclick="sendIncident('Situație de urgență')">🚨 Situație de urgență</div>
+  <div class="incident" onclick="sendIncident('Prăbușire mină')">🏗️ Prăbușire mină</div>
+  <div class="incident" onclick="sendIncident('Incident radioactiv')">☢️ Incident radioactiv</div>
+
+  <!-- 🔓 Acces neautorizat -->
+  <h2>🔓 Acces neautorizat</h2>
+  <div class="incident" onclick="sendIncident('Sigiliu compromis')">🔏 Sigiliu compromis</div>
+  <div class="incident" onclick="sendIncident('Cod QR compromis')">📎 Cod QR compromis</div>
+  <div class="incident" onclick="sendIncident('Lacăt compromis')">🔒 Lacăt compromis</div>
+  <div class="incident" onclick="sendIncident('Gard compromis')">🪵 Gard compromis</div>
+  <div class="incident" onclick="sendIncident('RFID compromis')">📶 RFID compromis</div>
+  <div class="incident" onclick="sendIncident('Camere compromise')">📷 Camere compromise</div>
+
+  <!-- 📦 Logistică -->
+  <h2>📦 Logistică și inventar</h2>
+  <div class="incident" onclick="sendIncident('Eroare inventar')">📋 Eroare inventar</div>
+  <div class="incident" onclick="sendIncident('Produse deteriorate')">📦 Produse deteriorate</div>
+  <div class="incident" onclick="sendIncident('Produse lipsă')">🧰 Produse lipsă</div>
+  <div class="incident" onclick="sendIncident('Depozitare incorectă')">📥 Depozitare incorectă</div>
+
+  <!-- ⚒️ Condiții de muncă -->
+  <h2>⚒️ Condiții periculoase</h2>
+  <div class="incident" onclick="sendIncident('Accident')">🆘 Accident</div>
+  <div class="incident" onclick="sendIncident('Rănire')">🩹 Rănire</div>
+  <div class="incident" onclick="sendIncident('Cădere de la înălțime')">🏗️ Cădere de la înălțime</div>
+
+  <!-- ⚡ Energie -->
+  <h2>⚡ Defecțiuni sistem electric</h2>
+  <div class="incident" onclick="sendIncident('Pene de curent')">🔌 Pene de curent</div>
+  <div class="incident" onclick="sendIncident('Oprire energie')">💡 Oprire energie</div>
+  <div class="incident" onclick="sendIncident('Defecțiune transformator')">⚙️ Defecțiune transformator</div>
+
+  <!-- 🔥 Gaz -->
+  <h2>🔥 Defecțiuni la gaz</h2>
+  <div class="incident" onclick="sendIncident('Pene de gaz')">🛢️ Pene de gaz</div>
+  <div class="incident" onclick="sendIncident('Oprire gaz')">⛽ Oprire gaz</div>
+  <div class="incident" onclick="sendIncident('Defecțiune magistrală')">🚧 Defecțiune magistrală</div>
+
+  <!-- 💾 IT -->
+  <h2>💾 Defecțiuni IT</h2>
+  <div class="incident" onclick="sendIncident('Atac cibernetic')">🛡️ Atac cibernetic</div>
+  <div class="incident" onclick="sendIncident('Server căzut')">🖥️ Server căzut</div>
+  <div class="incident" onclick="sendIncident('Probleme BDD')">📚 Probleme BDD</div>
+  <div class="incident" onclick="sendIncident('Scurgere de date')">🔐 Scurgere de date</div>
+
+  <!-- 📞 Comunicații -->
+  <h2>📞 Comunicații</h2>
+  <div class="incident" onclick="sendIncident('Linie telefonică căzută')">📴 Linie telefonică căzută</div>
+  <div class="incident" onclick="sendIncident('Internet căzut')">🌐 Internet căzut</div>
+  <div class="incident" onclick="sendIncident('Defecțiune echipament')">📡 Echipament defect</div>
+
+  <!-- 🚰 Apă -->
+  <h2>🚰 Apă și canalizare</h2>
+  <div class="incident" onclick="sendIncident('Oprire apă')">🚱 Oprire apă</div>
+  <div class="incident" onclick="sendIncident('Defecțiune rețea apă')">🚿 Defecțiune rețea apă</div>
+  <div class="incident" onclick="sendIncident('Defecțiune pompă')">💧 Defecțiune pompă</div>
+  <div class="incident" onclick="sendIncident('Canalizare blocată')">🚽 Canalizare blocată</div>
+  <div class="incident" onclick="sendIncident('Țeavă spartă')">🛁 Țeavă spartă</div>
+
+  <!-- 💨 Ventilare -->
+  <h2>💨 Ventilare și încălzire</h2>
+  <div class="incident" onclick="sendIncident('Ventilație căzută')">🌬️ Ventilație căzută</div>
+  <div class="incident" onclick="sendIncident('Aer condiționat căzut')">❄️ AC căzut</div>
+  <div class="incident" onclick="sendIncident('Încălzire căzută')">🔥 Încălzire căzută</div>
 
   <script>
     function sendIncident(incident) {
